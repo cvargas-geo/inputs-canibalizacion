@@ -1,0 +1,161 @@
+{
+    "SKIP": "enable",
+    "SOURCE_ENDPOINT_ARN": "arn:aws:dms:us-east-1:958531303673:endpoint:452KHXMN3SCETMQC75H3GZMR4TOJE4FJ35U5CFA",
+    "TARGET_ENDPOINT_ARN": "arn:aws:dms:us-east-1:958531303673:endpoint:P4I67EDIEL6HWRQ6WSXB7C2BR73C5Y7MUZ3EKXQ",
+    "FILTER_INSTANCE_REPLICATION": [
+        "dms-replication-instance-for-datalake"
+    ],
+    "FILTER_TASK_REPLICATION": [
+        "dms-task-instance-for-datalake2"
+    ],
+    "REPLICATION_INSTANCE_PARAMETERS": {
+        "ReplicationInstanceIdentifier": "dms-replication-instance-for-datalake",
+        "ReplicationInstanceClass": "dms.c5.xlarge",
+        "ReplicationInstanceClassMin": "dms.t2.micro",
+        "AllocatedStorage": 10,
+        "EngineVersion": "3.4.4",
+        "MultiAZ": false,
+        "ReplicationSubnetGroupIdentifier": "default-vpc-f944259d",
+        "VpcSecurityGroupIds": [
+            "sg-bd8547c4"
+        ]
+    },
+    "MIGRATION_TASK_PARAMETERS": {
+        "ReplicationTaskIdentifier": "dms-task-instance-for-datalake2",
+        "ReplicationInstanceArn.$": "$.DescribeResult.ReplicationInstances[0].ReplicationInstanceArn",
+        "SourceEndpointArn.$": "$.SOURCE_ENDPOINT_ARN",
+        "TargetEndpointArn.$": "$.TARGET_ENDPOINT_ARN",
+        "MigrationType": "full-load",
+        "TableMappings": {
+            "rules": [{
+                "rule-type": "selection",
+                "rule-id": "995195053",
+                "rule-name": "995195053",
+                "object-locator": {
+                    "schema-name": "country_mx",
+                    "table-name": "blocks"
+                },
+                "rule-action": "include",
+                "filters": []
+            }]
+        }
+    },
+    "nada": {
+        "MigrationType": "full-load",
+        "ReplicationInstanceArn.$": "$.DescribeResult.ReplicationInstances[0].ReplicationInstanceArn",
+        "ReplicationTaskIdentifier.$": "$.MIGRATION_TASK_PARAMETERS.ReplicationTaskIdentifier",
+        "SourceEndpointArn.$": "$.SOURCE_ENDPOINT_ARN",
+        "TargetEndpointArn.$": "$.TARGET_ENDPOINT_ARN",
+        "TableMappings.$": "$.MIGRATION_TASK_PARAMETERS.TableMappings"
+    },
+    "DescribeResult": {
+        "ReplicationInstances": [{
+            "AllocatedStorage": 10,
+            "AutoMinorVersionUpgrade": true,
+            "AvailabilityZone": "us-east-1b",
+            "EngineVersion": "3.4.4",
+            "InstanceCreateTime": "2022-05-03T02:08:41.048Z",
+            "KmsKeyId": "arn:aws:kms:us-east-1:958531303673:key/0577066e-c852-4cd1-8ffd-f76575e167be",
+            "MultiAZ": false,
+            "PendingModifiedValues": {},
+            "PreferredMaintenanceWindow": "fri:09:18-fri:09:48",
+            "PubliclyAccessible": true,
+            "ReplicationInstanceArn": "arn:aws:dms:us-east-1:958531303673:rep:D3I76PQLT32HOO7GLFRWVVFS74HH7YB4IUHBJWI",
+            "ReplicationInstanceClass": "dms.c5.xlarge",
+            "ReplicationInstanceIdentifier": "dms-replication-instance-for-datalake",
+            "ReplicationInstancePrivateIpAddress": "10.10.0.91",
+            "ReplicationInstancePrivateIpAddresses": [
+                "10.10.0.91"
+            ],
+            "ReplicationInstancePublicIpAddress": "52.54.161.45",
+            "ReplicationInstancePublicIpAddresses": [
+                "52.54.161.45"
+            ],
+            "ReplicationInstanceStatus": "available",
+            "ReplicationSubnetGroup": {
+                "ReplicationSubnetGroupDescription": "default group created by console for vpc id vpc-f944259d",
+                "ReplicationSubnetGroupIdentifier": "default-vpc-f944259d",
+                "SubnetGroupStatus": "Complete",
+                "Subnets": [{
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1a"
+                        },
+                        "SubnetIdentifier": "subnet-34588842",
+                        "SubnetStatus": "Active"
+                    },
+                    {
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1b"
+                        },
+                        "SubnetIdentifier": "subnet-068b91a2d1ed25081",
+                        "SubnetStatus": "Active"
+                    },
+                    {
+                        "SubnetAvailabilityZone": {
+                            "Name": "us-east-1a"
+                        },
+                        "SubnetIdentifier": "subnet-24588852",
+                        "SubnetStatus": "Active"
+                    }
+                ],
+                "VpcId": "vpc-f944259d"
+            },
+            "VpcSecurityGroups": [{
+                "Status": "active",
+                "VpcSecurityGroupId": "sg-bd8547c4"
+            }]
+        }]
+    },
+    "CreateResponse": {
+        "ReplicationTask": {
+            "MigrationType": "full-load",
+            "ReplicationInstanceArn": "arn:aws:dms:us-east-1:958531303673:rep:D3I76PQLT32HOO7GLFRWVVFS74HH7YB4IUHBJWI",
+            "ReplicationTaskArn": "arn:aws:dms:us-east-1:958531303673:task:OZFLAVLZO52XVBOJXPZOMTEK6D7VRVPGVSHQTDI",
+            "ReplicationTaskCreationDate": "2022-05-03T03:28:31.499Z",
+            "ReplicationTaskIdentifier": "dms-task-instance-for-datalake2",
+            "ReplicationTaskSettings": "{\"TargetMetadata\":{\"TargetSchema\":\"\",\"SupportLobs\":true,\"FullLobMode\":false,\"LobChunkSize\":64,\"LimitedSizeLobMode\":true,\"LobMaxSize\":32,\"InlineLobMaxSize\":0,\"LoadMaxFileSize\":0,\"ParallelLoadThreads\":0,\"ParallelLoadBufferSize\":0,\"BatchApplyEnabled\":false,\"TaskRecoveryTableEnabled\":false,\"ParallelLoadQueuesPerThread\":0,\"ParallelApplyThreads\":0,\"ParallelApplyBufferSize\":0,\"ParallelApplyQueuesPerThread\":0},\"FullLoadSettings\":{\"TargetTablePrepMode\":\"DROP_AND_CREATE\",\"CreatePkAfterFullLoad\":false,\"StopTaskCachedChangesApplied\":false,\"StopTaskCachedChangesNotApplied\":false,\"MaxFullLoadSubTasks\":8,\"TransactionConsistencyTimeout\":600,\"CommitRate\":10000},\"Logging\":{\"EnableLogging\":false,\"LogComponents\":[{\"Id\":\"DATA_STRUCTURE\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"COMMUNICATION\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"IO\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"COMMON\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"FILE_FACTORY\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"FILE_TRANSFER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"REST_SERVER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"ADDONS\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TARGET_LOAD\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TARGET_APPLY\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"SOURCE_UNLOAD\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"SOURCE_CAPTURE\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TRANSFORMATION\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"SORTER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TASK_MANAGER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TABLES_MANAGER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"METADATA_MANAGER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"PERFORMANCE\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"VALIDATOR_EXT\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"}],\"CloudWatchLogGroup\":null,\"CloudWatchLogStream\":null},\"ControlTablesSettings\":{\"historyTimeslotInMinutes\":5,\"ControlSchema\":\"\",\"HistoryTimeslotInMinutes\":5,\"HistoryTableEnabled\":false,\"SuspendedTablesTableEnabled\":false,\"StatusTableEnabled\":false,\"FullLoadExceptionTableEnabled\":false},\"StreamBufferSettings\":{\"StreamBufferCount\":3,\"StreamBufferSizeInMB\":8,\"CtrlStreamBufferSizeInMB\":5},\"ChangeProcessingDdlHandlingPolicy\":{\"HandleSourceTableDropped\":true,\"HandleSourceTableTruncated\":true,\"HandleSourceTableAltered\":true},\"ErrorBehavior\":{\"DataErrorPolicy\":\"LOG_ERROR\",\"EventErrorPolicy\":null,\"DataTruncationErrorPolicy\":\"LOG_ERROR\",\"DataErrorEscalationPolicy\":\"SUSPEND_TABLE\",\"DataErrorEscalationCount\":0,\"TableErrorPolicy\":\"SUSPEND_TABLE\",\"TableErrorEscalationPolicy\":\"STOP_TASK\",\"TableErrorEscalationCount\":0,\"RecoverableErrorCount\":-1,\"RecoverableErrorInterval\":5,\"RecoverableErrorThrottling\":true,\"RecoverableErrorThrottlingMax\":1800,\"RecoverableErrorStopRetryAfterThrottlingMax\":true,\"ApplyErrorDeletePolicy\":\"IGNORE_RECORD\",\"ApplyErrorInsertPolicy\":\"LOG_ERROR\",\"ApplyErrorUpdatePolicy\":\"LOG_ERROR\",\"ApplyErrorEscalationPolicy\":\"LOG_ERROR\",\"ApplyErrorEscalationCount\":0,\"ApplyErrorFailOnTruncationDdl\":false,\"FullLoadIgnoreConflicts\":true,\"FailOnTransactionConsistencyBreached\":false,\"FailOnNoTablesCaptured\":true},\"ChangeProcessingTuning\":{\"BatchApplyPreserveTransaction\":true,\"BatchApplyTimeoutMin\":1,\"BatchApplyTimeoutMax\":30,\"BatchApplyMemoryLimit\":500,\"BatchSplitSize\":0,\"MinTransactionSize\":1000,\"CommitTimeout\":1,\"MemoryLimitTotal\":1024,\"MemoryKeepTime\":60,\"StatementCacheSize\":50},\"PostProcessingRules\":null,\"CharacterSetSettings\":null,\"LoopbackPreventionSettings\":null,\"BeforeImageSettings\":null,\"FailTaskWhenCleanTaskResourceFailed\":false,\"TTSettings\":null}",
+            "SourceEndpointArn": "arn:aws:dms:us-east-1:958531303673:endpoint:452KHXMN3SCETMQC75H3GZMR4TOJE4FJ35U5CFA",
+            "Status": "creating",
+            "TableMappings": "{\"rules\":[{\"rule-type\":\"selection\",\"rule-id\":\"995195053\",\"rule-name\":\"995195053\",\"object-locator\":{\"schema-name\":\"country_mx\",\"table-name\":\"blocks\"},\"rule-action\":\"include\",\"filters\":[]}]}",
+            "TargetEndpointArn": "arn:aws:dms:us-east-1:958531303673:endpoint:P4I67EDIEL6HWRQ6WSXB7C2BR73C5Y7MUZ3EKXQ"
+        }
+    },
+    "StartTaskResult": {
+        "ReplicationTask": {
+            "MigrationType": "full-load",
+            "ReplicationInstanceArn": "arn:aws:dms:us-east-1:958531303673:rep:D3I76PQLT32HOO7GLFRWVVFS74HH7YB4IUHBJWI",
+            "ReplicationTaskArn": "arn:aws:dms:us-east-1:958531303673:task:OZFLAVLZO52XVBOJXPZOMTEK6D7VRVPGVSHQTDI",
+            "ReplicationTaskCreationDate": "2022-05-03T03:28:31.499Z",
+            "ReplicationTaskIdentifier": "dms-task-instance-for-datalake2",
+            "ReplicationTaskSettings": "{\"TargetMetadata\":{\"TargetSchema\":\"\",\"SupportLobs\":true,\"FullLobMode\":false,\"LobChunkSize\":64,\"LimitedSizeLobMode\":true,\"LobMaxSize\":32,\"InlineLobMaxSize\":0,\"LoadMaxFileSize\":0,\"ParallelLoadThreads\":0,\"ParallelLoadBufferSize\":0,\"BatchApplyEnabled\":false,\"TaskRecoveryTableEnabled\":false,\"ParallelLoadQueuesPerThread\":0,\"ParallelApplyThreads\":0,\"ParallelApplyBufferSize\":0,\"ParallelApplyQueuesPerThread\":0},\"FullLoadSettings\":{\"TargetTablePrepMode\":\"DROP_AND_CREATE\",\"CreatePkAfterFullLoad\":false,\"StopTaskCachedChangesApplied\":false,\"StopTaskCachedChangesNotApplied\":false,\"MaxFullLoadSubTasks\":8,\"TransactionConsistencyTimeout\":600,\"CommitRate\":10000},\"Logging\":{\"EnableLogging\":false,\"LogComponents\":[{\"Id\":\"DATA_STRUCTURE\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"COMMUNICATION\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"IO\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"COMMON\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"FILE_FACTORY\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"FILE_TRANSFER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"REST_SERVER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"ADDONS\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TARGET_LOAD\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TARGET_APPLY\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"SOURCE_UNLOAD\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"SOURCE_CAPTURE\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TRANSFORMATION\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"SORTER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TASK_MANAGER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TABLES_MANAGER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"METADATA_MANAGER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"PERFORMANCE\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"VALIDATOR_EXT\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"}],\"CloudWatchLogGroup\":null,\"CloudWatchLogStream\":null},\"ControlTablesSettings\":{\"historyTimeslotInMinutes\":5,\"ControlSchema\":\"\",\"HistoryTimeslotInMinutes\":5,\"HistoryTableEnabled\":false,\"SuspendedTablesTableEnabled\":false,\"StatusTableEnabled\":false,\"FullLoadExceptionTableEnabled\":false},\"StreamBufferSettings\":{\"StreamBufferCount\":3,\"StreamBufferSizeInMB\":8,\"CtrlStreamBufferSizeInMB\":5},\"ChangeProcessingDdlHandlingPolicy\":{\"HandleSourceTableDropped\":true,\"HandleSourceTableTruncated\":true,\"HandleSourceTableAltered\":true},\"ErrorBehavior\":{\"DataErrorPolicy\":\"LOG_ERROR\",\"EventErrorPolicy\":null,\"DataTruncationErrorPolicy\":\"LOG_ERROR\",\"DataErrorEscalationPolicy\":\"SUSPEND_TABLE\",\"DataErrorEscalationCount\":0,\"TableErrorPolicy\":\"SUSPEND_TABLE\",\"TableErrorEscalationPolicy\":\"STOP_TASK\",\"TableErrorEscalationCount\":0,\"RecoverableErrorCount\":-1,\"RecoverableErrorInterval\":5,\"RecoverableErrorThrottling\":true,\"RecoverableErrorThrottlingMax\":1800,\"RecoverableErrorStopRetryAfterThrottlingMax\":true,\"ApplyErrorDeletePolicy\":\"IGNORE_RECORD\",\"ApplyErrorInsertPolicy\":\"LOG_ERROR\",\"ApplyErrorUpdatePolicy\":\"LOG_ERROR\",\"ApplyErrorEscalationPolicy\":\"LOG_ERROR\",\"ApplyErrorEscalationCount\":0,\"ApplyErrorFailOnTruncationDdl\":false,\"FullLoadIgnoreConflicts\":true,\"FailOnTransactionConsistencyBreached\":false,\"FailOnNoTablesCaptured\":true},\"ChangeProcessingTuning\":{\"BatchApplyPreserveTransaction\":true,\"BatchApplyTimeoutMin\":1,\"BatchApplyTimeoutMax\":30,\"BatchApplyMemoryLimit\":500,\"BatchSplitSize\":0,\"MinTransactionSize\":1000,\"CommitTimeout\":1,\"MemoryLimitTotal\":1024,\"MemoryKeepTime\":60,\"StatementCacheSize\":50},\"PostProcessingRules\":null,\"CharacterSetSettings\":null,\"LoopbackPreventionSettings\":null,\"BeforeImageSettings\":null,\"FailTaskWhenCleanTaskResourceFailed\":false,\"TTSettings\":null}",
+            "ReplicationTaskStartDate": "2022-05-03T03:29:31.810Z",
+            "SourceEndpointArn": "arn:aws:dms:us-east-1:958531303673:endpoint:452KHXMN3SCETMQC75H3GZMR4TOJE4FJ35U5CFA",
+            "Status": "starting",
+            "TableMappings": "{\"rules\":[{\"rule-type\":\"selection\",\"rule-id\":\"995195053\",\"rule-name\":\"995195053\",\"object-locator\":{\"schema-name\":\"country_mx\",\"table-name\":\"blocks\"},\"rule-action\":\"include\",\"filters\":[]}]}",
+            "TargetEndpointArn": "arn:aws:dms:us-east-1:958531303673:endpoint:P4I67EDIEL6HWRQ6WSXB7C2BR73C5Y7MUZ3EKXQ"
+        }
+    },
+    "DescribeTaskResult": {
+        "ReplicationTasks": [{
+            "MigrationType": "full-load",
+            "ReplicationInstanceArn": "arn:aws:dms:us-east-1:958531303673:rep:D3I76PQLT32HOO7GLFRWVVFS74HH7YB4IUHBJWI",
+            "ReplicationTaskArn": "arn:aws:dms:us-east-1:958531303673:task:OZFLAVLZO52XVBOJXPZOMTEK6D7VRVPGVSHQTDI",
+            "ReplicationTaskCreationDate": "2022-05-03T03:28:31.499Z",
+            "ReplicationTaskIdentifier": "dms-task-instance-for-datalake2",
+            "ReplicationTaskSettings": "{\"TargetMetadata\":{\"TargetSchema\":\"\",\"SupportLobs\":true,\"FullLobMode\":false,\"LobChunkSize\":64,\"LimitedSizeLobMode\":true,\"LobMaxSize\":32,\"InlineLobMaxSize\":0,\"LoadMaxFileSize\":0,\"ParallelLoadThreads\":0,\"ParallelLoadBufferSize\":0,\"BatchApplyEnabled\":false,\"TaskRecoveryTableEnabled\":false,\"ParallelLoadQueuesPerThread\":0,\"ParallelApplyThreads\":0,\"ParallelApplyBufferSize\":0,\"ParallelApplyQueuesPerThread\":0},\"FullLoadSettings\":{\"TargetTablePrepMode\":\"DROP_AND_CREATE\",\"CreatePkAfterFullLoad\":false,\"StopTaskCachedChangesApplied\":false,\"StopTaskCachedChangesNotApplied\":false,\"MaxFullLoadSubTasks\":8,\"TransactionConsistencyTimeout\":600,\"CommitRate\":10000},\"Logging\":{\"EnableLogging\":false,\"LogComponents\":[{\"Id\":\"DATA_STRUCTURE\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"COMMUNICATION\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"IO\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"COMMON\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"FILE_FACTORY\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"FILE_TRANSFER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"REST_SERVER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"ADDONS\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TARGET_LOAD\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TARGET_APPLY\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"SOURCE_UNLOAD\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"SOURCE_CAPTURE\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TRANSFORMATION\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"SORTER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TASK_MANAGER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"TABLES_MANAGER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"METADATA_MANAGER\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"PERFORMANCE\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"},{\"Id\":\"VALIDATOR_EXT\",\"Severity\":\"LOGGER_SEVERITY_DEFAULT\"}],\"CloudWatchLogGroup\":null,\"CloudWatchLogStream\":null},\"ControlTablesSettings\":{\"historyTimeslotInMinutes\":5,\"ControlSchema\":\"\",\"HistoryTimeslotInMinutes\":5,\"HistoryTableEnabled\":false,\"SuspendedTablesTableEnabled\":false,\"StatusTableEnabled\":false,\"FullLoadExceptionTableEnabled\":false},\"StreamBufferSettings\":{\"StreamBufferCount\":3,\"StreamBufferSizeInMB\":8,\"CtrlStreamBufferSizeInMB\":5},\"ChangeProcessingDdlHandlingPolicy\":{\"HandleSourceTableDropped\":true,\"HandleSourceTableTruncated\":true,\"HandleSourceTableAltered\":true},\"ErrorBehavior\":{\"DataErrorPolicy\":\"LOG_ERROR\",\"EventErrorPolicy\":null,\"DataTruncationErrorPolicy\":\"LOG_ERROR\",\"DataErrorEscalationPolicy\":\"SUSPEND_TABLE\",\"DataErrorEscalationCount\":0,\"TableErrorPolicy\":\"SUSPEND_TABLE\",\"TableErrorEscalationPolicy\":\"STOP_TASK\",\"TableErrorEscalationCount\":0,\"RecoverableErrorCount\":-1,\"RecoverableErrorInterval\":5,\"RecoverableErrorThrottling\":true,\"RecoverableErrorThrottlingMax\":1800,\"RecoverableErrorStopRetryAfterThrottlingMax\":true,\"ApplyErrorDeletePolicy\":\"IGNORE_RECORD\",\"ApplyErrorInsertPolicy\":\"LOG_ERROR\",\"ApplyErrorUpdatePolicy\":\"LOG_ERROR\",\"ApplyErrorEscalationPolicy\":\"LOG_ERROR\",\"ApplyErrorEscalationCount\":0,\"ApplyErrorFailOnTruncationDdl\":false,\"FullLoadIgnoreConflicts\":true,\"FailOnTransactionConsistencyBreached\":false,\"FailOnNoTablesCaptured\":true},\"ChangeProcessingTuning\":{\"BatchApplyPreserveTransaction\":true,\"BatchApplyTimeoutMin\":1,\"BatchApplyTimeoutMax\":30,\"BatchApplyMemoryLimit\":500,\"BatchSplitSize\":0,\"MinTransactionSize\":1000,\"CommitTimeout\":1,\"MemoryLimitTotal\":1024,\"MemoryKeepTime\":60,\"StatementCacheSize\":50},\"PostProcessingRules\":null,\"CharacterSetSettings\":null,\"LoopbackPreventionSettings\":null,\"BeforeImageSettings\":null,\"FailTaskWhenCleanTaskResourceFailed\":false,\"TTSettings\":null}",
+            "ReplicationTaskStartDate": "2022-05-03T03:29:31.810Z",
+            "ReplicationTaskStats": {
+                "ElapsedTimeMillis": 0,
+                "FullLoadProgressPercent": 0,
+                "TablesErrored": 0,
+                "TablesLoaded": 0,
+                "TablesLoading": 0,
+                "TablesQueued": 0
+            },
+            "SourceEndpointArn": "arn:aws:dms:us-east-1:958531303673:endpoint:452KHXMN3SCETMQC75H3GZMR4TOJE4FJ35U5CFA",
+            "Status": "starting",
+            "TableMappings": "{\"rules\":[{\"rule-type\":\"selection\",\"rule-id\":\"995195053\",\"rule-name\":\"995195053\",\"object-locator\":{\"schema-name\":\"country_mx\",\"table-name\":\"blocks\"},\"rule-action\":\"include\",\"filters\":[]}]}",
+            "TargetEndpointArn": "arn:aws:dms:us-east-1:958531303673:endpoint:P4I67EDIEL6HWRQ6WSXB7C2BR73C5Y7MUZ3EKXQ"
+        }]
+    }
+}

@@ -1,0 +1,91 @@
+{
+    "SKIP": "enables",
+    "SKIP_DELETE": "true",
+    "DEFAULT_WAIT_SECONDS": 60,
+    "SOURCE_ENDPOINT_ARN": "arn:aws:dms:us-east-1:958531303673:endpoint:dms-datos-prod",
+    "TARGET_ENDPOINT_ARN": "arn:aws:dms:us-east-1:958531303673:endpoint:LXF5MWFWSY7M7US6US4KPDME242KSJSLFBGNOBQ",
+
+
+    "TARGET_ENDPOINT_ARN_QA_COUNTRIES": "arn:aws:dms:us-east-1:958531303673:endpoint:LXF5MWFWSY7M7US6US4KPDME242KSJSLFBGNOBQ",
+    "TARGET_ENDPOINT_ARN_QA_AWS_MIGRATIONS": "arn:aws:dms:us-east-1:958531303673:endpoint:LXF5MWFWSY7M7US6US4KPDME242KSJSLFBGNOBQ",
+    "TARGET_ENDPOINT_ARN_QA_COUNTRIE_BUFFERS": "arn:aws:dms:us-east-1:958531303673:endpoint:LXF5MWFWSY7M7US6US4KPDME242KSJSLFBGNOBQ",
+    "ReplicationInstanceIdentifier": "dms-replication-instance-for-datosb",
+    "ReplicationTaskIdentifier": "dms-replication-task-for-datosb",
+    "FILTER_INSTANCE_REPLICATION": [
+        "dms-replication-instance-for-datosb"
+    ],
+    "FILTER_TASK_REPLICATION": [
+        "dms-replication-task-for-datosb"
+    ],
+    "REPLICATION_INSTANCE_PARAMETERS": {
+        "ReplicationInstanceIdentifier.$": "$.ReplicationInstanceIdentifier",
+        "ReplicationInstanceClass": "dms.c5.4xlarge",
+        "ReplicationInstanceClassMin": "dms.t2.micro",
+        "AllocatedStorage": 50,
+        "EngineVersion": "3.4.4",
+        "MultiAZ": false,
+        "ReplicationSubnetGroupIdentifier": "default-vpc-f944259d",
+        "VpcSecurityGroupIds": [
+            "sg-bd8547c4"
+        ]
+    },
+    "MIGRATION_TASK_PARAMETERS": {
+        "ReplicationTaskIdentifier.$": "$.ReplicationTaskIdentifier",
+        "ReplicationInstanceArn.$": "$.DescribeResult.ReplicationInstances[0].ReplicationInstanceArn",
+        "SourceEndpointArn.$": "$.SOURCE_ENDPOINT_ARN",
+        "TargetEndpointArn.$": "$.TARGET_ENDPOINT_ARN",
+        "MigrationType": "full-load",
+        "TableMappings": {
+            "rules": [{
+                    "rule-type": "selection",
+                    "rule-id": "995195053",
+                    "rule-name": "995195053",
+                    "object-locator": {
+                        "schema-name": "normalizador",
+                        "table-name": "direccion"
+                    },
+                    "rule-action": "include",
+                    "filters": []
+                },
+                {
+                    "rule-type": "selection",
+                    "rule-id": "995195054",
+                    "rule-name": "995195054",
+                    "object-locator": {
+                        "schema-name": "normalizador",
+                        "table-name": "calles_comunas_view"
+                    },
+                    "rule-action": "include",
+                    "filters": []
+                }
+
+            ]
+        },
+        "TableMappings1": {
+            "rules": [{
+                    "rule-type": "selection",
+                    "rule-id": "995195053",
+                    "rule-name": "995195053",
+                    "object-locator": {
+                        "schema-name": "normalizador",
+                        "table-name": "direccion"
+                    },
+                    "rule-action": "include",
+                    "filters": []
+                },
+                {
+                    "rule-type": "selection",
+                    "rule-id": "995195053",
+                    "rule-name": "995195053",
+                    "object-locator": {
+                        "schema-name": "normalizador",
+                        "table-name": "calles_comunas_view"
+                    },
+                    "rule-action": "include",
+                    "filters": []
+                }
+
+            ]
+        }
+    }
+}

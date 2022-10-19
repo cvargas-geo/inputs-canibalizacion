@@ -1,0 +1,80 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "customers_map",
+    "States": {
+        "customers_map": {
+            "Type": "Map",
+            "Iterator": {
+                "StartAt": "country map",
+                "States": {
+                    "country map": {
+                        "Type": "Map",
+                        "Next": "Pass (1)",
+                        "Iterator": {
+                            "StartAt": "workflow_inputs_estudios_etl",
+                            "States": {
+                                "workflow_inputs_estudios_etl": {
+                                    "Type": "Task",
+                                    "Resource": "arn:aws:states:::states:startExecution.sync:2",
+                                    "Parameters": {
+                                        "StateMachineArn": "arn:aws:states:us-east-1:958531303673:stateMachine:workflow_inputs_estudios_etl",
+                                        "Input.$": "$"
+                                    },
+                                    "End": true,
+                                    "ResultSelector": {
+                                        "PASS": "OK"
+                                    },
+                                    "OutputPath": "$.PASS"
+                                }
+                            }
+                        },
+                        "ItemsPath": "$.country_list",
+                        "MaxConcurrency": 40,
+                        "Parameters": {
+                            "customer_name.$": "$.customer_name",
+                            "etl_name": "locales_propios",
+                            "country_name.$": "$$.Map.Item.Value",
+                            "drop_workflow.$": "$.drop_workflow",
+                            "parametros.$": "$.parametros"
+                        },
+                        "Comment": "Para esta sf se especifica en duro el nombre del etl , pues es un flujo diferente solamente por pais",
+                        "ResultSelector": {
+                            "country_res.$": "$[*]"
+                        },
+                        "OutputPath": "$.country_res"
+                    },
+                    "Pass (1)": {
+                        "Type": "Pass",
+                        "End": true
+                    }
+                }
+            },
+            "ItemsPath": "$.customer_list",
+            "MaxConcurrency": 40,
+            "Parameters": {
+                "customer_name.$": "$$.Map.Item.Value.customer_name",
+                "country_list.$": "$$.Map.Item.Value.country_list",
+                "buffer_list.$": "$$.Map.Item.Value.buffer_list",
+                "drop_workflow.$": "$$.Map.Item.Value.drop_workflow",
+                "parametros.$": "$$.Map.Item.Value.parametros"
+            },
+            "ResultSelector": {
+                "customer_res.$": "$[*]"
+            },
+            "ResultPath": "$.locales_results",
+            "Next": "Success",
+            "Catch": [{
+                "ErrorEquals": [
+                    "States.ALL"
+                ],
+                "Next": "Fail"
+            }]
+        },
+        "Fail": {
+            "Type": "Fail"
+        },
+        "Success": {
+            "Type": "Succeed"
+        }
+    }
+}

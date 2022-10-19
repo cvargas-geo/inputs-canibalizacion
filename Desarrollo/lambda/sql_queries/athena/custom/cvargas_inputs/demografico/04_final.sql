@@ -1,0 +1,62 @@
+/*change*/
+	SELECT   
+        A.geo_id,
+        A.gse1,
+        A.gse2,
+        A.gse3,
+        A.gse4,
+        A.gse5,
+        A.gse6,
+        A.gse7,
+        A.pob_gse1,
+        A.pob_gse2,
+        A.pob_gse3,
+        A.pob_gse4,
+        A.pob_gse5,
+        A.pob_gse6,
+        A.pob_gse7,
+        A.pob_edad1,
+        A.pob_edad2,
+        A.pob_edad3,
+        A.pob_edad4,
+        A.pob_edad5,
+        A.pob_edad6,
+        A.pob_edad7,
+        A.pob_edad8,
+        A.pob_edad9,
+        A.pob_edad10,
+        A.pob_edad11,
+        A.pob_edad12,
+        A.pob_edad13,
+        A.pob_edad14,
+        A.pob_edad15,
+        A.pob_edad16,
+        A.pob_edad17,
+        A.pob_edad18,
+        A.pob_edad19,
+        A.pob_edad20,
+        A.pob_edad21,
+        A.total_men,
+        A.total_women,
+        A.total_households,
+        A.total_population,
+        A.pxq,
+        A.recoba_id,
+        /*  CS.geo_id, */
+        CS.comercios,
+        CS.servicios,
+        CS.sba_comercios,
+        CS.sba_servicios,
+        CS.ssa_comercios,
+        CS.ssa_servicios,
+         /* E.geo_id, */
+        E.empresas,
+        E.empleados, 
+		BB.longitud longitud_mz ,
+		BB.latitud latitud_mz
+		/* step_customer_co_demografico_intersect_blocks_buffers_b600 */
+	FROM      prod_inputs_estudios.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_demografico_intersect_blocks_buffers_b{{params.BUFFER}}     A
+	LEFT JOIN prod_inputs_estudios.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_demografico_intersect_pois_buffers_b{{params.BUFFER}}       CS ON CS.geo_id = A.geo_id
+	LEFT JOIN prod_inputs_estudios.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_demografico_intersect_empresas_buffers_b{{params.BUFFER}}   E ON E.geo_id = A.geo_id
+	LEFT JOIN prod_countries.country_{{params.COUNTRY}}_view_blocks_buffers BB  ON  BB.block_id = A.geo_id  
+	

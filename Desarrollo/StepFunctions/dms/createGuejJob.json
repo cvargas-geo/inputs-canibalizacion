@@ -1,0 +1,32 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "CreateJob",
+    "States": {
+        "CreateJob": {
+            "Type": "Task",
+            "Parameters": {
+                "Command": {
+                    "Name": "glueetl",
+                    "ScriptLocation": "s3://georesearch-datalake/demo_datalake/0_glue_scripts/country_cl_categories.py",
+                    "PythonVersion": "3"
+                },
+                "Role": "arn:aws:iam::958531303673:role/AWSGlueServiceRole",
+                "GlueVersion": "3.0",
+                "DefaultArguments": {
+                    "--job-bookmark-option": "job-bookmark-enable",
+                    "--enable-auto-scaling": "true"
+                },
+                "ExecutionProperty": {
+                    "MaxConcurrentRuns": 100
+                },
+                "MaxRetries": 0,
+                "Timeout": 2880,
+                "Name": "SFDummyJob",
+                "WorkerType": "G.2X",
+                "NumberOfWorkers": 4
+            },
+            "Resource": "arn:aws:states:::aws-sdk:glue:createJob",
+            "End": true
+        }
+    }
+}

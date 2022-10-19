@@ -1,0 +1,28 @@
+{
+    "Dag": {
+        "node-1": {
+            "classification": "DataSource",
+            "type": "Catalog",
+            "inputs": [],
+            "database": "migracion_postgres",
+            "name": "Data Catalog table",
+            "generatedNodeName": "DataCatalogtable_node1",
+            "codeGenVersion": 2,
+            "table": "mastergeo_countries_customer_geolab_cvargas_country_cl_blocks"
+        },
+        "node-1649953615613": {
+            "classification": "DataSink",
+            "type": "S3",
+            "name": "Amazon S3",
+            "inputs": ["node-1"],
+            "format": "glueparquet",
+            "compression": "snappy",
+            "path": "s3://georesearch-datalake/demo_datalake/raw/mastergeo_countries_customer_geolab_cvargas_country_cl_blocks/",
+            "partitionKeys": [],
+            "updateCatalogOptions": "schemaAndPartitions",
+            "schemaChangePolicy": { "enableUpdateCatalog": true, "updateBehavior": "UPDATE_IN_DATABASE", "database": "qa_migracion_postgres", "table": "country_cl_blocks" },
+            "generatedNodeName": "AmazonS3_node1649953615613",
+            "codeGenVersion": 2
+        }
+    }
+}

@@ -1,0 +1,7 @@
+Jinja2<=3.1.0
+# psycopg2-binary==2.8.5
+# emoji
+#Nota usar : slim: true el serverless.yml para no exluir test files de jinga2
+# awswrangler
+# aws-psycopg2
+# aws-psycopg2-binary==2.8.5

@@ -1,0 +1,27 @@
+{
+    "DagNodes": [{
+            "Id": "DataSource0",
+            "NodeType": "DataSource",
+            "Args": [
+                { "Name": "database", "Value": "mydatabase_source" },
+                { "Name": "table_name", "Value": "mytable_source" },
+                { "Name": "transformation_ctx", "Value": "DataSource0" }
+            ]
+        },
+        {
+            "Id": "DataSink0",
+            "NodeType": "DataSink",
+            "Args": [
+                { "Name": "database", "Value": "mydatabase_sink" },
+                { "Name": "table_name", "Value": "mytable_sink" },
+                { "Name": "transformation_ctx", "Value": "DataSink0" }
+            ]
+        }
+    ],
+    "DagEdges": [
+        { "Source": "DataSource0", "Target": "Transform1" },
+        { "Source": "Transform1", "Target": "Transform0" },
+        { "Source": "Transform0", "Target": "DataSink0" }
+    ],
+    "Language": "PYTHON"
+}

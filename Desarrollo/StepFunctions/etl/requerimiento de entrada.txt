@@ -1,0 +1,24 @@
+//http://www.objgen.com/json
+//https://beta5.objgen.com/json
+
+
+
+customer_list [0]
+  customer_name s = derco a
+  country_list [] s = mx , co 
+  buffer_list [] n = 600 , 1000 , 1500
+  id_gasto [] n = 21 , 15
+  id_competencias [] n =  1,2,3,4,5,6,7,8,9
+  etl_demografico  b = true
+  etl_gastos  b = true
+  etl_list [] s = demografico, gastos, competencias,flujos,destinos,locales_propios
+
+customer_list [1]
+  customer_name s = derco b
+  country_list [] s = cl, pe 
+  buffer_list [] n = 2500, 3000
+  id_gasto [] n = 11 , 5
+  id_competencias [] n =  1,2,3,4,5
+  etl_demografico  b = true
+  etl_gastos  b = true
+  etl_list [] s = demografico, gastos, competencias,flujos,destinos,locales_propios

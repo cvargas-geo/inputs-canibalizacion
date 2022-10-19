@@ -1,0 +1,115 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [{
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "glue:GetDatabase",
+                "athena:GetWorkGroup",
+                "athena:StartQueryExecution",
+                "athena:GetQueryResultsStream",
+                "glue:CreateTable",
+                "glue:GetTables",
+                "athena:GetQueryExecution",
+                "athena:GetQueryResults",
+                "athena:GetDatabase",
+                "athena:GetDataCatalog",
+                "glue:GetTable"
+            ],
+            "Resource": [
+                "arn:aws:glue:*:958531303673:table/*/*",
+                "arn:aws:glue:*:958531303673:catalog",
+                "arn:aws:glue:*:958531303673:database/*",
+                "arn:aws:athena:*:958531303673:datacatalog/*",
+                "arn:aws:athena:*:958531303673:workgroup/*"
+            ]
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "glue:GetDatabase",
+                "glue:CreateTable",
+                "glue:GetTables",
+                "glue:StartCrawler",
+                "glue:GetTable"
+            ],
+            "Resource": [
+                "arn:aws:glue:*:958531303673:table/*/*",
+                "arn:aws:glue:*:958531303673:catalog",
+                "arn:aws:glue:*:958531303673:database/*"
+            ]
+        },
+        {
+            "Sid": "VisualEditor2",
+            "Effect": "Allow",
+            "Action": [
+                "dms:DescribeEndpointSettings",
+                "s3:ListAccessPointsForObjectLambda",
+                "s3:GetAccessPoint",
+                "s3:PutStorageLensConfiguration",
+                "dms:DescribeSchemas",
+                "dms:DeleteReplicationInstance",
+                "dms:DescribeReplicationTaskIndividualAssessments",
+                "dms:ModifyReplicationTask",
+                "dms:StartReplicationTask",
+                "dms:CreateEndpoint",
+                "dms:DescribeReplicationTaskAssessmentRuns",
+                "dms:StartReplicationTaskAssessment",
+                "dms:CreateReplicationSubnetGroup",
+                "dms:DescribeConnections",
+                "s3:PutAccountPublicAccessBlock",
+                "dms:DescribeReplicationInstances",
+                "dms:DeleteReplicationTaskAssessmentRun",
+                "dms:DescribeApplicableIndividualAssessments",
+                "lambda:InvokeFunction",
+                "s3:ListAccessPoints",
+                "dms:DeleteReplicationTask",
+                "s3:ListJobs",
+                "dms:TestConnection",
+                "dms:DescribeEndpoints",
+                "dms:DescribeReplicationInstanceTaskLogs",
+                "s3:ListMultiRegionAccessPoints",
+                "dms:DescribeReplicationSubnetGroups",
+                "dms:DescribeReplicationTasks",
+                "dms:DescribeReplicationTaskAssessmentResults",
+                "dms:CreateReplicationInstance",
+                "s3:ListStorageLensConfigurations",
+                "dms:CreateEventSubscription",
+                "s3:GetAccountPublicAccessBlock",
+                "dms:StartReplicationTaskAssessmentRun",
+                "s3:ListAllMyBuckets",
+                "s3:PutAccessPointPublicAccessBlock",
+                "dms:StopReplicationTask",
+                "dms:RebootReplicationInstance",
+                "dms:DescribeTableStatistics",
+                "states:StartExecution",
+                "dms:CreateReplicationTask",
+                "s3:CreateJob"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "VisualEditor3",
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3::958531303673:accesspoint/*",
+                "arn:aws:s3:::*/*"
+            ]
+        },
+        {
+            "Sid": "VisualEditor4",
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": [
+                "arn:aws:s3:::*",
+                "arn:aws:s3-object-lambda:*:958531303673:accesspoint/*",
+                "arn:aws:s3:*:958531303673:accesspoint/*",
+                "arn:aws:s3:*:958531303673:job/*",
+                "arn:aws:s3:us-west-2:958531303673:async-request/mrap/*/*",
+                "arn:aws:s3:*:958531303673:storage-lens/*"
+            ]
+        }
+    ]
+}

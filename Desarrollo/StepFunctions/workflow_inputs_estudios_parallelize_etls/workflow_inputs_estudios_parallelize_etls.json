@@ -1,0 +1,274 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "Parallel",
+    "States": {
+        "Parallel": {
+            "Type": "Parallel",
+            "Next": "customers map 2",
+            "Branches": [{
+                    "StartAt": "workflow_inputs_estudios_parallelize_locales_propios (1)",
+                    "States": {
+                        "workflow_inputs_estudios_parallelize_locales_propios (1)": {
+                            "Type": "Task",
+                            "Resource": "arn:aws:states:::states:startExecution.sync:2",
+                            "Parameters": {
+                                "StateMachineArn": "arn:aws:states:us-east-1:958531303673:stateMachine:workflow_inputs_estudios_parallelize_locales_propios",
+                                "Input.$": "$"
+                            },
+                            "ResultSelector": {
+                                "PASS": "OK"
+                            },
+                            "OutputPath": "$.PASS",
+                            "End": true
+                        }
+                    }
+                },
+                {
+                    "StartAt": "customers map",
+                    "States": {
+                        "customers map": {
+                            "Type": "Map",
+                            "Iterator": {
+                                "StartAt": "etls map",
+                                "States": {
+                                    "etls map": {
+                                        "Type": "Map",
+                                        "Next": "Pass 1",
+                                        "Iterator": {
+                                            "StartAt": "country map",
+                                            "States": {
+                                                "country map": {
+                                                    "Type": "Map",
+                                                    "Next": "Pass (1) 1",
+                                                    "Iterator": {
+                                                        "StartAt": "buffer map",
+                                                        "States": {
+                                                            "buffer map": {
+                                                                "Type": "Map",
+                                                                "Next": "Pass (2) 1",
+                                                                "Iterator": {
+                                                                    "StartAt": "workflow_inputs_estudios_etl",
+                                                                    "States": {
+                                                                        "workflow_inputs_estudios_etl": {
+                                                                            "Type": "Task",
+                                                                            "Resource": "arn:aws:states:::states:startExecution.sync:2",
+                                                                            "Parameters": {
+                                                                                "StateMachineArn": "arn:aws:states:us-east-1:958531303673:stateMachine:workflow_inputs_estudios_etl",
+                                                                                "Input.$": "$"
+                                                                            },
+                                                                            "ResultSelector": {
+                                                                                "PASS": "OK"
+                                                                            },
+                                                                            "OutputPath": "$.PASS",
+                                                                            "End": true
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "ItemsPath": "$.buffer_list",
+                                                                "Parameters": {
+                                                                    "customer_name.$": "$.customer_name",
+                                                                    "etl_name.$": "$.etl_name",
+                                                                    "country_name.$": "$.country_name",
+                                                                    "buffer.$": "$$.Map.Item.Value",
+                                                                    "drop_workflow.$": "$.drop_workflow",
+                                                                    "id_gastos.$": "$.id_gastos",
+                                                                    "parametros.$": "$.parametros"
+                                                                },
+                                                                "ResultSelector": {
+                                                                    "buffer_res.$": "$[1][*]"
+                                                                },
+                                                                "OutputPath": "$.buffer_res",
+                                                                "MaxConcurrency": 40
+                                                            },
+                                                            "Pass (2) 1": {
+                                                                "Type": "Pass",
+                                                                "End": true
+                                                            }
+                                                        }
+                                                    },
+                                                    "ItemsPath": "$.country_list",
+                                                    "Parameters": {
+                                                        "customer_name.$": "$.customer_name",
+                                                        "etl_name.$": "$.etl_name",
+                                                        "country_name.$": "$$.Map.Item.Value",
+                                                        "buffer_list.$": "$.buffer_list",
+                                                        "drop_workflow.$": "$.drop_workflow",
+                                                        "id_gastos.$": "$.id_gastos",
+                                                        "parametros.$": "$.parametros"
+                                                    },
+                                                    "ResultSelector": {
+                                                        "country_res.$": "$[1][*]"
+                                                    },
+                                                    "OutputPath": "$.country_res",
+                                                    "MaxConcurrency": 40
+                                                },
+                                                "Pass (1) 1": {
+                                                    "Type": "Pass",
+                                                    "End": true
+                                                }
+                                            }
+                                        },
+                                        "ItemsPath": "$.etl_list",
+                                        "Parameters": {
+                                            "customer_name.$": "$.customer_name",
+                                            "etl_name.$": "$$.Map.Item.Value",
+                                            "country_list.$": "$.country_list",
+                                            "buffer_list.$": "$.buffer_list",
+                                            "drop_workflow.$": "$.drop_workflow",
+                                            "id_gastos.$": "$.id_gastos",
+                                            "parametros.$": "$.parametros"
+                                        },
+                                        "ResultSelector": {
+                                            "etl_res.$": "$[1][*]"
+                                        },
+                                        "OutputPath": "$.etl_res",
+                                        "MaxConcurrency": 40
+                                    },
+                                    "Pass 1": {
+                                        "Type": "Pass",
+                                        "End": true
+                                    }
+                                }
+                            },
+                            "ItemsPath": "$.customer_list",
+                            "Parameters": {
+                                "customer_name.$": "$$.Map.Item.Value.customer_name",
+                                "country_list.$": "$$.Map.Item.Value.country_list",
+                                "buffer_list.$": "$$.Map.Item.Value.buffer_list",
+                                "etl_list.$": "$$.Map.Item.Value.etl_list",
+                                "drop_workflow.$": "$$.Map.Item.Value.drop_workflow",
+                                "id_gastos.$": "$$.Map.Item.Value.id_gastos",
+                                "parametros.$": "$$.Map.Item.Value.parametros"
+                            },
+                            "ResultSelector": {
+                                "customer_res.$": "$[1][*]"
+                            },
+                            "MaxConcurrency": 40,
+                            "ResultPath": "$.etls_results",
+                            "Next": "Pass"
+                        },
+                        "Pass": {
+                            "Type": "Pass",
+                            "End": true
+                        }
+                    }
+                }
+            ],
+            "Catch": [{
+                "ErrorEquals": [
+                    "States.ALL"
+                ],
+                "Next": "Fail"
+            }],
+            "ResultSelector": {
+                "parallell_res.$": "$[*]"
+            },
+            "ResultPath": "$.parallell_res"
+        },
+        "customers map 2": {
+            "Type": "Map",
+            "Iterator": {
+                "StartAt": "country map 2",
+                "States": {
+                    "country map 2": {
+                        "Type": "Map",
+                        "Next": "Pass (1) 2",
+                        "Iterator": {
+                            "StartAt": "buffer map 2",
+                            "States": {
+                                "buffer map 2": {
+                                    "Type": "Map",
+                                    "Next": "Pass (2) 2",
+                                    "Iterator": {
+                                        "StartAt": "workflow_inputs_estudios_consolidar",
+                                        "States": {
+                                            "workflow_inputs_estudios_consolidar": {
+                                                "Type": "Task",
+                                                "Resource": "arn:aws:states:::states:startExecution.sync:2",
+                                                "Parameters": {
+                                                    "StateMachineArn": "arn:aws:states:us-east-1:958531303673:stateMachine:workflow_inputs_estudios_consolidar",
+                                                    "Input.$": "$"
+                                                },
+                                                "End": true,
+                                                "ResultSelector": {
+                                                    "PASS": "OK"
+                                                },
+                                                "OutputPath": "$.PASS"
+                                            }
+                                        }
+                                    },
+                                    "ItemsPath": "$.buffer_list",
+                                    "Parameters": {
+                                        "customer_name.$": "$.customer_name",
+                                        "country_name.$": "$.country_name",
+                                        "buffer.$": "$$.Map.Item.Value",
+                                        "drop_workflow.$": "$.drop_workflow",
+                                        "id_gastos.$": "$.id_gastos",
+                                        "etl_name": "consolidar",
+                                        "parametros.$": "$.parametros"
+                                    },
+                                    "ResultSelector": {
+                                        "buffer_res.$": "$[*]"
+                                    },
+                                    "OutputPath": "$.buffer_res",
+                                    "MaxConcurrency": 40,
+                                    "Comment": "En este paso se agrega al inputs, el nombre etl = consolidar , para continuar con la ultima parte "
+                                },
+                                "Pass (2) 2": {
+                                    "Type": "Pass",
+                                    "End": true
+                                }
+                            }
+                        },
+                        "ItemsPath": "$.country_list",
+                        "Parameters": {
+                            "customer_name.$": "$.customer_name",
+                            "country_name.$": "$$.Map.Item.Value",
+                            "buffer_list.$": "$.buffer_list",
+                            "drop_workflow.$": "$.drop_workflow",
+                            "id_gastos.$": "$.id_gastos",
+                            "parametros.$": "$.parametros"
+                        },
+                        "ResultSelector": {
+                            "country_res.$": "$[*]"
+                        },
+                        "OutputPath": "$.country_res",
+                        "MaxConcurrency": 40
+                    },
+                    "Pass (1) 2": {
+                        "Type": "Pass",
+                        "End": true
+                    }
+                }
+            },
+            "Catch": [{
+                "ErrorEquals": [
+                    "States.ALL"
+                ],
+                "ResultPath": "$.consolidacion_error",
+                "Next": "Fail"
+            }],
+            "ItemsPath": "$.customer_list",
+            "Parameters": {
+                "customer_name.$": "$$.Map.Item.Value.customer_name",
+                "country_list.$": "$$.Map.Item.Value.country_list",
+                "buffer_list.$": "$$.Map.Item.Value.buffer_list",
+                "drop_workflow.$": "$$.Map.Item.Value.drop_workflow",
+                "id_gastos.$": "$$.Map.Item.Value.id_gastos",
+                "parametros.$": "$$.Map.Item.Value.parametros"
+            },
+            "ResultSelector": {
+                "customer_res.$": "$[*]"
+            },
+            "OutputPath": "$.customer_res",
+            "Next": "Success",
+            "MaxConcurrency": 40
+        },
+        "Success": {
+            "Type": "Succeed"
+        },
+        "Fail": {
+            "Type": "Fail"
+        }
+    }
+}

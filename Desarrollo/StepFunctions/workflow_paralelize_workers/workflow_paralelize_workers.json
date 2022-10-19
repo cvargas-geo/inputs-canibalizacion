@@ -1,0 +1,142 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "Existe al menos una tarea ?",
+    "States": {
+        "Existe al menos una tarea ?": {
+            "Type": "Choice",
+            "Choices": [{
+                "Not": {
+                    "Variable": "$.worker_tasks_list[0]",
+                    "IsPresent": true
+                },
+                "Next": "Fail"
+            }],
+            "Default": "Parallelize create tables",
+            "Comment": "valida $.worker_tasks_list[0] que exista un elemento en la lista de tareas "
+        },
+        "Fail": {
+            "Type": "Fail"
+        },
+        "Parallelize create tables": {
+            "Type": "Map",
+            "Iterator": {
+                "StartAt": "lambda for delete s3 files from table",
+                "States": {
+                    "lambda for delete s3 files from table": {
+                        "Type": "Task",
+                        "Resource": "arn:aws:states:::lambda:invoke",
+                        "Parameters": {
+                            "FunctionName.$": "$.lambda_name",
+                            "Payload": {
+                                "customer_name.$": "$.worker_parameters.customer_name",
+                                "table_name.$": "$.worker_parameters.table_name",
+                                "sql_query.$": "$.worker_parameters.sql_query",
+                                "drop_table.$": "$.worker_parameters.drop_table"
+                            }
+                        },
+                        "Retry": [{
+                            "ErrorEquals": [
+                                "Lambda.ServiceException",
+                                "Lambda.AWSLambdaException",
+                                "Lambda.SdkClientException"
+                            ],
+                            "IntervalSeconds": 2,
+                            "MaxAttempts": 6,
+                            "BackoffRate": 2
+                        }],
+                        "TimeoutSeconds": 900,
+                        "Comment": "NOTA : el lambda elimina los datos de la tabla, luego retorna la querie de la tabla ",
+                        "Next": "Wait",
+                        "ResultPath": "$.Payload"
+                    },
+                    "Wait": {
+                        "Type": "Wait",
+                        "Next": "Si drop_table = true , se salta la creación de la tabla",
+                        "Seconds": 1
+                    },
+                    "Si drop_table = true , se salta la creación de la tabla": {
+                        "Type": "Choice",
+                        "Choices": [{
+                                "Variable": "$.worker_parameters.drop_table",
+                                "BooleanEquals": true,
+                                "Next": "Success (1)"
+                            },
+                            {
+                                "Variable": "$.worker_parameters.drop_table",
+                                "BooleanEquals": false,
+                                "Next": "Athena StartQueryExecution reitent on failure !!! max 1800 s"
+                            }
+                        ]
+                    },
+                    "Athena StartQueryExecution reitent on failure !!! max 1800 s": {
+                        "Type": "Task",
+                        "Resource": "arn:aws:states:::athena:startQueryExecution.sync",
+                        "Parameters": {
+                            "QueryString.$": "$.Payload.Payload.dll_querie",
+                            "WorkGroup": "primary"
+                        },
+                        "ResultPath": "$.QueryExecution",
+                        "Next": "Choice",
+                        "OutputPath": "$.QueryExecution",
+                        "Retry": [{
+                            "ErrorEquals": [
+                                "States.TaskFailed"
+                            ],
+                            "BackoffRate": 1,
+                            "IntervalSeconds": 60,
+                            "MaxAttempts": 30
+                        }],
+                        "TimeoutSeconds": 1800
+                    },
+                    "Choice": {
+                        "Type": "Choice",
+                        "Choices": [{
+                                "Variable": "$.QueryExecution.Status.State",
+                                "StringMatches": "SUCCEEDED",
+                                "Next": "Success (1)"
+                            },
+                            {
+                                "Variable": "$.QueryExecution.Status.State",
+                                "StringMatches": "FAILED",
+                                "Next": "Fail (1)"
+                            }
+                        ]
+                    },
+                    "Success (1)": {
+                        "Type": "Succeed"
+                    },
+                    "Fail (1)": {
+                        "Type": "Fail"
+                    }
+                }
+            },
+            "MaxConcurrency": 40,
+            "ItemsPath": "$.worker_tasks_list",
+            "Parameters": {
+                "task_name.$": "$$.Map.Item.Value.task_name",
+                "worker_parameters.$": "$$.Map.Item.Value.worker_parameters",
+                "lambda_name.$": "$$.Map.Item.Value.lambda_name"
+            },
+            "Next": "Pass",
+            "Catch": [{
+                "ErrorEquals": [
+                    "States.ALL"
+                ],
+                "Next": "Fail",
+                "ResultPath": "$.worker_tasks_list_error"
+            }],
+            "ResultPath": "$.map_results"
+        },
+        "Pass": {
+            "Type": "Pass",
+            "Next": "Success",
+            "Result": {
+                "PASS": "OK"
+            },
+            "OutputPath": "$.PASS"
+        },
+        "Success": {
+            "Type": "Succeed"
+        }
+    }
+}

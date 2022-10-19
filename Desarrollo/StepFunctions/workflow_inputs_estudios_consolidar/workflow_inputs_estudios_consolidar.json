@@ -1,0 +1,97 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "EJECUTAR ETL",
+    "States": {
+        "EJECUTAR ETL": {
+            "Type": "Choice",
+            "Choices": [{
+                "Variable": "$.etl_name",
+                "StringMatches": "consolidar",
+                "Next": "C ETAPA 1"
+            }],
+            "Comment": "{   \"id_gastos\": [     1,     2,     3   ],   \"country_name\": \"pe\",   \"drop_workflow\": false,   \"customer_name\": \"dummy_customer\",   \"buffer\": 4000,   \"etl_name\": \"consolidar\" }"
+        },
+        "C ETAPA 1": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+                "Payload": {
+                    "stage": 1,
+                    "id_gastos.$": "$.id_gastos",
+                    "country_name.$": "$.country_name",
+                    "drop_workflow.$": "$.drop_workflow",
+                    "customer_name.$": "$.customer_name",
+                    "buffer.$": "$.buffer",
+                    "etl_name": "consolidar",
+                    "parametros.$": "$.parametros"
+                },
+                "FunctionName": "arn:aws:lambda:us-east-1:958531303673:function:reporte-canibalizacion-dev-etl"
+            },
+            "Retry": [{
+                "ErrorEquals": [
+                    "Lambda.ServiceException",
+                    "Lambda.AWSLambdaException",
+                    "Lambda.SdkClientException"
+                ],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 6,
+                "BackoffRate": 2
+            }],
+            "ResultSelector": {
+                "response.$": "$.Payload.response"
+            },
+            "Comment": "Retorna las 3 primeras intersecciones ",
+            "ResultPath": "$.etapa1",
+            "Next": "workflow_paralelize_workers (5)"
+        },
+        "workflow_paralelize_workers (5)": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::states:startExecution.sync:2",
+            "Parameters": {
+                "StateMachineArn": "arn:aws:states:us-east-1:958531303673:stateMachine:workflow_paralelize_workers",
+                "Input": {
+                    "worker_tasks_list.$": "$.etapa1.response.worker_tasks_list"
+                }
+            },
+            "ResultSelector": {
+                "result.$": "$.Output",
+                "etapa": 1
+            },
+            "ResultPath": "$.result_etapa1",
+            "Next": "C ETAPA 2"
+        },
+        "C ETAPA 2": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+                "Payload": {
+                    "stage": 2,
+                    "id_gastos.$": "$.id_gastos",
+                    "country_name.$": "$.country_name",
+                    "drop_workflow.$": "$.drop_workflow",
+                    "customer_name.$": "$.customer_name",
+                    "buffer.$": "$.buffer",
+                    "etl_name": "consolidar",
+                    "parametros.$": "$.parametros"
+                },
+                "FunctionName": "arn:aws:lambda:us-east-1:958531303673:function:reporte-canibalizacion-dev-etl"
+            },
+            "Retry": [{
+                "ErrorEquals": [
+                    "Lambda.ServiceException",
+                    "Lambda.AWSLambdaException",
+                    "Lambda.SdkClientException"
+                ],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 6,
+                "BackoffRate": 2
+            }],
+            "ResultSelector": {
+                "response.$": "$.Payload.response"
+            },
+            "Comment": "Tabla final del etl",
+            "ResultPath": "$.etapa2",
+            "End": true
+        }
+    }
+}

@@ -1,0 +1,136 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "DescribeReplicationInstances",
+    "States": {
+        "DescribeReplicationInstances": {
+            "Type": "Task",
+            "Next": "Choice (2)",
+            "Parameters": {},
+            "Resource": "arn:aws:states:::aws-sdk:databasemigration:describeReplicationInstances"
+        },
+        "Choice (2)": {
+            "Type": "Choice",
+            "Choices": [{
+                    "Variable": "$.DescribeResult.ReplicationInstances[0].ReplicationInstanceStatus ",
+                    "StringMatches": "available",
+                    "Next": "TestConnection"
+                },
+                {
+                    "Variable": "$.DescribeResult.ReplicationInstances[0].ReplicationInstanceStatus ",
+                    "StringMatches": "creating",
+                    "Next": "Wait 30s"
+                },
+                {
+                    "Variable": "$.DescribeResult.ReplicationInstances[0].ReplicationInstanceStatus",
+                    "StringMatches": "failed",
+                    "Next": "FAIL Pass"
+                }
+            ]
+        },
+        "TestConnection": {
+            "Type": "Task",
+            "Parameters": {
+                "EndpointArn": "arn:aws:dms:us-east-1:958531303673:endpoint:SWB6D4PA7CWSBPZNNXXRVLTODU",
+                "ReplicationInstanceArn.$": "$.DescribeResult.ReplicationInstances[0].ReplicationInstanceArn"
+            },
+            "Resource": "arn:aws:states:::aws-sdk:databasemigration:testConnection.waitForTaskToken",
+            "ResultPath": "$ConnResult",
+            "Catch": [{
+                "ErrorEquals": [
+                    "States.ALL"
+                ],
+                "Next": "FAIL Pass"
+            }],
+            "Next": "Choice (3)"
+        },
+        "Choice (3)": {
+            "Type": "Choice",
+            "Choices": [{
+                "Variable": "$ConnResult.Connection.Status ~= \"successful\"",
+                "StringMatches": "successful",
+                "Next": "Success"
+            }],
+            "Default": "FAIL Pass"
+        },
+        "Success": {
+            "Type": "Succeed"
+        },
+        "Choice": {
+            "Type": "Choice",
+            "Choices": [{
+                    "Variable": "$TestResult.Connection.Status",
+                    "StringMatches": "successful",
+                    "Next": "Choice (1)"
+                },
+                {
+                    "Or": [{
+                            "Variable": "$TestResult.Connection.Status",
+                            "StringMatches": "failed"
+                        },
+                        {
+                            "Variable": "$TestResult.Connection.Status",
+                            "StringMatches": "deleting"
+                        }
+                    ],
+                    "Next": "FAIL Pass"
+                },
+                {
+                    "Variable": "$TestResult.Connection.Status",
+                    "StringMatches": "testing",
+                    "Next": "Choice"
+                }
+            ]
+        },
+        "Choice (1)": {
+            "Type": "Choice",
+            "Choices": [{
+                    "Variable": "$CreateResponce.ReplicationInstance.ReplicationInstanceStatus",
+                    "StringMatches": "available",
+                    "Next": "StartReplicationTask"
+                },
+                {
+                    "Variable": "$CreateResponce.ReplicationInstance.ReplicationInstanceStatus",
+                    "StringMatches": "failed",
+                    "Next": "FAIL Pass"
+                },
+                {
+                    "Variable": "$CreateResponce.ReplicationInstance.ReplicationInstanceStatus",
+                    "StringMatches": "creating",
+                    "Next": "Wait 30  s"
+                }
+            ]
+        },
+        "StartReplicationTask": {
+            "Type": "Task",
+            "Parameters": {
+                "ReplicationTaskArn": "MyData",
+                "StartReplicationTaskType": "MyData"
+            },
+            "Resource": "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
+            "Next": "DescribeReplicationTasks"
+        },
+        "DescribeReplicationTasks": {
+            "Type": "Task",
+            "Parameters": {},
+            "Resource": "arn:aws:states:::aws-sdk:databasemigration:describeReplicationTasks",
+            "End": true
+        },
+        "FAIL Pass": {
+            "Type": "Pass",
+            "Next": "Fail"
+        },
+        "Fail": {
+            "Type": "Fail"
+        },
+        "Wait 30  s": {
+            "Type": "Wait",
+            "Seconds": 30,
+            "Next": "Choice (1)"
+        },
+        "Wait 30s": {
+            "Type": "Wait",
+            "Seconds": 30,
+            "Next": "DescribeReplicationInstances"
+        }
+    }
+}

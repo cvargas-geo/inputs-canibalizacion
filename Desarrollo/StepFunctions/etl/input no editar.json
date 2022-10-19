@@ -1,0 +1,72 @@
+{
+    "customer_list": [{
+            "customer_name": "derco a",
+            "country_list": [
+                "mx",
+                "co"
+            ],
+            "buffer_list": [
+                600,
+                1000,
+                1500
+            ],
+            "id_gasto": [
+                21,
+                15
+            ],
+            "id_competencias": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9
+            ],
+            "etl_demografico": true,
+            "etl_gastos": true,
+            "etl_list": [
+                "demografico",
+                "gastos",
+                "competencias",
+                "flujos",
+                "destinos",
+                "locales_propios"
+            ]
+        },
+        {
+            "customer_name": "derco b",
+            "country_list": [
+                "cl",
+                "pe"
+            ],
+            "buffer_list": [
+                2500,
+                3000
+            ],
+            "id_gasto": [
+                11,
+                5
+            ],
+            "id_competencias": [
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "etl_demografico": true,
+            "etl_gastos": true,
+            "etl_list": [
+                "demografico",
+                "gastos",
+                "competencias",
+                "flujos",
+                "destinos",
+                "locales_propios"
+            ]
+        }
+    ]
+}

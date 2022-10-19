@@ -1,0 +1,36 @@
+{
+    "customer_list": [{
+            "customer_name": "derco a",
+            "country_list": [
+                "mx", "cl", "us"
+            ],
+            "buffer_list": [
+                600, 1000
+            ],
+            "id_gasto": [
+                21,
+                15
+            ],
+            "etl_list": [
+                "demografico", "gastos", "competencias"
+            ]
+        },
+        {
+            "customer_name": "derco b",
+            "country_list": [
+                "pe", "co"
+
+            ],
+            "buffer_list": [
+                2500
+            ],
+            "id_gasto": [
+                11,
+                5
+            ],
+            "etl_list": [
+                "demografico"
+            ]
+        }
+    ]
+}
