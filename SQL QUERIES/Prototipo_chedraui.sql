@@ -7,7 +7,7 @@ PRINCIPALES CAMBIOS
 -- EL SPCANIBALIZACION_CREATE_TABLE SE SEPARA EN 2 CTE , LISTA POIS Y TABLA PRECALCULO , UNIENOD LA PRIMERA CON LA ULTIMA POR SUS ID (LEFT) 
 -- TODO 
 -- UNIFICAR EL CALCULO DEL GASTO EN UNA SOLA OP SUM 
-
+-- eliminar lista de pois y passarlo al where no mas 
 ojo 
 
 SE filtran las tablas por like '%POLYGON%' PUES EL DMS TRUNCA LOS SHAPES GRANDES 
@@ -173,10 +173,7 @@ WITH
         p.sales_area > 0 and b.gasto > 0 
         -- and p.id = $1 -- pasa a lef join con A subselect 
     )
-    
-     
-    
 
-    SELECT  *   FROM TABLA_PRECALCULO  --173183501 1 GB  
-    
+    SELECT  *   FROM TABLA_PRECALCULO  --173183501 1 GB  24 min 
+
     --ORDER BY gasto DESC  limit 1000
