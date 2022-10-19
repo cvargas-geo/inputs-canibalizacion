@@ -123,14 +123,12 @@ WITH
         -- inner join customer_gastronomia_negocios.gasto_crap b 
         -- on ST_intersects(p.shape, b.buffer_1500 )  
         -- on ST_Distance(p.shape, b.shape, true) between 1 and 1500
-         on ST_intersects(p.shape_wkt, b.buffer_1500 )  
+        ON ST_intersects(p.shape_wkt, b.buffer_1500 )  
         where
         -- ST_intersects(p.shape, b.buffer_1500 )  
         -- and 
         p.sales_area > 0 and b.gasto > 0 
         -- and p.id = $1 -- pasa a lef join con A subselect 
     )
-    
+
     SELECT * FROM TABLA_PRECALCULO
-    
-    
