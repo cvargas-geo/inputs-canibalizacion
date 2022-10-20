@@ -1,0 +1,63 @@
+{
+    "environment": "PROD",
+    "report_name": "ficcus",
+    "schema": "cl",
+    "report_to": [
+        "cvargas@georesearch.cl"
+    ],
+    "drop_workflow": false,
+    "buffer_search": 2000,
+    "pois_state_id": 1,
+    "surface_factor": -1.95,
+    "distance_factor": 1.1,
+    "start_point": "POINT(X,X)",
+    "cannibalization_shape": "POLYGON((X,X))",
+    "canasta_categoria_id": [
+        34
+    ],
+    "substring_id_o_subcadena": [
+        4,
+        5,
+        6
+    ],
+    "pois_category_id": [
+        10008
+    ],
+    "etl_list": [
+        "local",
+        "delivery"
+    ],
+    "local_cannibalization_reports": [{
+        "drop_workflow": false,
+        "buffer_search": 2000,
+        "pois_state_id": 1,
+        "surface_factor": -1.95,
+        "distance_factor": 1.1,
+        "start_point": "POINT(X,X)",
+        "cannibalization_shape": "POLYGON((X,X))",
+        "canasta_categoria_id": [
+            34
+        ],
+        "substring_id_o_subcadena": [
+            4,
+            5,
+            6
+        ],
+        "pois_category_id": [
+            10008
+        ]
+    }],
+    "delivery_cannibalization_reports": [{
+        "drop_workflow": false,
+        "canasta_categoria_id": [
+            34
+        ],
+        "substring_id_o_subcadena": [
+            4,
+            5,
+            6
+        ],
+        "start_point": "POINT(X,X)",
+        "cannibalization_shape": "POLYGON((X,X))"
+    }]
+}

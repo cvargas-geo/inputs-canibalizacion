@@ -25,6 +25,7 @@ provider:
     QUERY_LIMIT: ""
     WAITING_TIME_IN_SECONDS: 900
     SF_01_NAME_PARALLELIZE_ETLS: workflow_${sls:stage}_${self:service}_parallelize_etls
+    SF_01_NAME_PARALLELIZE_ETLS: workflow_${sls:stage}_${self:service}_parallelize_etls
     SF_02_NAME_DMS_SERVICE: workflow_${sls:stage}_dms_replicacion
     # 5 dias
     EXPIRE_URL_SECONDS: 7776000
@@ -209,7 +210,7 @@ functions:
     # name: ${self:service}-modelv2-${self:custom.stage}
     description:   ${self:service}  Servicio de creacion de reportes para canibalización  [${self:custom.stage}]
     memorySize: 256
-    handler: api_reportes.master_report
+    handler: api_report.master_report
     # Maximum retry attempts when an asynchronous invocation fails (between 0 and 2; default: 2)
     maximumRetryAttempts: 0
     layers:
@@ -249,7 +250,7 @@ functions:
     # name: ${self:service}-modelv2-${self:custom.stage}
     description:   ${self:service} Crea una tabla en Athena [${self:custom.stage}]
     memorySize: 500
-    handler: api_reportes.worker_athena_create_table
+    handler: api_report.worker_athena_create_table
     # Maximum retry attempts when an asynchronous invocation fails (between 0 and 2; default: 2)
     maximumRetryAttempts: 0
     layers:
@@ -283,7 +284,7 @@ functions:
     #       cors: true
 
 
-    description:   ${self:service} Crea una tabla en Athena para los inputs de estudios [${self:custom.stage}]
+    description:   ${self:service} Crea una tabla en Athena dado una query [${self:custom.stage}]
     memorySize: 500
     handler: api_etl.handler 
     # Maximum retry attempts when an asynchronous invocation fails (between 0 and 2; default: 2)

@@ -10,9 +10,15 @@ PRINCIPALES CAMBIOS
 -- eliminar lista de pois y passarlo al where no mas 
 ojo 
 
-SE filtran las tablas por like '%POLYGON%' PUES EL DMS TRUNCA LOS SHAPES GRANDES 
-*/
+SE filtran las tablas por like '%POLYGON%' PUES EL DMS TRUNCA LOS SHAPES GRANDES
 
+
+20 MIN CON BUFFER DE BUSQUEDA DE 20 KM
+26 MIN CON BUFFER DE BUSQUEDA DE 30 KM
+X.X    CON BUFFER DE BUSQUEDA DE 35 KM
+X.X    CON BUFFER DE BUSQUEDA DE 50 KM
+
+*/
 
 
 WITH
@@ -117,22 +123,22 @@ WITH
     
 
 /*INICIO DEL SP_CREATE_TABLE_PRECALCULO*/
-    ,LISTA_POIS AS (
-        select
-            id
-        from country_mx_pois_comercios_servicios_view p
-        where p.category_id in (10008)
-        and p.pois_state_id = 1
-        -- and subcadena in ('ACHOCLONADOS','BUFALO BEEF','BUFFET EXPRESS','BURGER KING','CARLS JR',
-        -- 	  'CHINA WOK','DELICIAS','DOGGIS','DOMINO','DOMINOS PIZZA','DONY DONER',
-        -- 	  'FRUTOS','FUENTE NICANOR','JUAN MAESTRO','JUST BURGER','KFC',
-        -- 	  'LITTLE CAESARS PIZZA','LOMITON','LOVDO','MAMMA MIA',
-        -- 	  'MAMMATERRA','MCDONALDS','MELT','NIU SUSHI','PAGODA',
-        -- 	  'PAPA JOHNS','PEDRO JUAN Y DIEGO','PIZZA HUT','PIZZA PIZZA',
-        -- 	  'PLATON','POLLO STOP','ROOF BURGER','SUBWAY','SUSHI BLUES',
-        -- 	  'TACO BELL','TARRAGONA','TELEPIZZA','TOMMY BEANS','WENDYS')
-        --   order by p.id asc -- ESTO ESTA DE MAS
-    )
+    -- ,LISTA_POIS AS (
+    --     select
+    --         id
+    --     from country_mx_pois_comercios_servicios_view p
+    --     where p.category_id in (10008)
+    --     and p.pois_state_id = 1
+    --     -- and subcadena in ('ACHOCLONADOS','BUFALO BEEF','BUFFET EXPRESS','BURGER KING','CARLS JR',
+    --     -- 	  'CHINA WOK','DELICIAS','DOGGIS','DOMINO','DOMINOS PIZZA','DONY DONER',
+    --     -- 	  'FRUTOS','FUENTE NICANOR','JUAN MAESTRO','JUST BURGER','KFC',
+    --     -- 	  'LITTLE CAESARS PIZZA','LOMITON','LOVDO','MAMMA MIA',
+    --     -- 	  'MAMMATERRA','MCDONALDS','MELT','NIU SUSHI','PAGODA',
+    --     -- 	  'PAPA JOHNS','PEDRO JUAN Y DIEGO','PIZZA HUT','PIZZA PIZZA',
+    --     -- 	  'PLATON','POLLO STOP','ROOF BURGER','SUBWAY','SUSHI BLUES',
+    --     -- 	  'TACO BELL','TARRAGONA','TELEPIZZA','TOMMY BEANS','WENDYS')
+    --     --   order by p.id asc -- ESTO ESTA DE MAS
+    -- )
     -- SELECT * FROM LISTA_POIS
     , TABLA_PRECALCULO AS (
         select
@@ -148,8 +154,8 @@ WITH
                 * 
             POWER(p.sales_area, 1.1) AS num
             
-        from LISTA_POIS a
-        left join (SELECT id , sales_area  ,  shape_wkt from  country_mx_pois_comercios_servicios_view  where   ST_IsValid(ST_GeometryFromText(shape_wkt))  ) p on a.id = p.id
+        -- FROM (SELECT id , sales_area  ,  shape_wkt from  country_mx_pois_comercios_servicios_view  where   ST_IsValid(ST_GeometryFromText(shape_wkt))  ) p  
+        FROM country_mx_pois_comercios_servicios_view   p  
         -- left join country_mx_pois_comercios_servicios_view  p on a.id=p.id
         INNER join TABLA_GASTOS b 
         -- inner join customer_gastronomia_negocios.gasto_crap b 
@@ -163,17 +169,21 @@ WITH
             /*Pseudo buffer no es 100% circular , se alarga en los polos ,  pero es una buena aproximacion pues respeta el radio*/
             ST_Buffer(
                 ST_GeometryFromText( b.shape  ) ,
-                    20000.0 * 360.0 / (2.0 * pi() * cos( radians(ST_Y(b.shape )) )* 6400000.0)    
+                    30000.0 * 360.0 / (2.0 * pi() * cos( radians(ST_Y(b.shape )) )* 6400000.0)    
             )   
         )  
         where
+        p.category_id in (10008)
         --   p.shape_wkt  LIKE 'POINT(%)' AND 
         -- ST_intersects(p.shape, b.buffer_1500 )  
         -- and 
-        p.sales_area > 0 and b.gasto > 0 
+        AND p.sales_area > 0 and b.gasto > 0 
         -- and p.id = $1 -- pasa a lef join con A subselect 
     )
+    
+     
+    
 
-    SELECT  *   FROM TABLA_PRECALCULO  --173183501 1 GB  24 min 
-
+    SELECT  *   FROM TABLA_PRECALCULO  --173183501 925 MB
+    
     --ORDER BY gasto DESC  limit 1000

@@ -2,20 +2,19 @@ try:
     import unzip_requirements
 except ImportError:
     pass
-import time 
+import time
 import traceback
 import boto3
 import json
-from utils import athena  as  atn 
-from utils import step_functions  as  sf 
+from utils import athena  as  atn
+from utils import step_functions  as  sf
 from utils.conf import SF_01_NAME_PARALLELIZE_ETLS , DEFAULT_BUFFERS  ,TARGET_DB , S3_BUCKET_DATALAKE , s3_prefix_delivery_output_data,EXPIRE_URL_SECONDS
 import logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 s3_client = boto3.client('s3')
 sf_client = boto3.client('stepfunctions')
-# global SOURCE_DB  
-# global TARGET_DB  
+
 
 def master_report(event, context):
     # start_time = time.time()
@@ -25,21 +24,21 @@ def master_report(event, context):
     log = {}
     customer_list = event.get('customer_list', None)
     environment = event.get('environment', None)
-    
-    def validate_request(event ): 
-        
+
+    def validate_request(event ):
+
         if 'environment' not in  event:
             raise ValueError(f"❌ environment no ha sido especificado")
-        
+
         customer_list = event['customer_list']
-        if customer_list : 
+        if customer_list :
 
             #valida los buffers
-            for solicitud in customer_list :  
+            for solicitud in customer_list :
                 if solicitud['buffer_list']:
                     for buffer in solicitud['buffer_list']:
                         if buffer not in DEFAULT_BUFFERS :
-                            raise ValueError(f"❌ El buffer ingresado [{buffer}] no esta permitido actualmente, Buffers validos son: {DEFAULT_BUFFERS}")    
+                            raise ValueError(f"❌ El buffer ingresado [{buffer}] no esta permitido actualmente, Buffers validos son: {DEFAULT_BUFFERS}")
                 else:
                     raise ValueError(f"❌ buffer_list no ha sido especificado")
 
@@ -66,14 +65,14 @@ def master_report(event, context):
             se debe implementar un sistema para monitorear el estado de la ejecución por medio de eventos """
             response = sf.iniciar_step_function(SF_01_NAME_PARALLELIZE_ETLS ,input_data )
             execution_arn = response['executionArn']
-            
+
             # Se agrega algo de log para la salida de la ejecución
             sf_response = sf.sfn_client.describe_execution(executionArn=execution_arn)
             status = sf_response['status']
             if status == 'FAILED':
                 sf_error = sf_response['QueryExecution']['Status']['StateChangeReason']
                 raise Exception(sf_error)
-            
+
             return {"status": status,"executionArn": execution_arn} 
         # else:
         #     raise ValueError("❌ customer_list no ha sido especificado")
