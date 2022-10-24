@@ -16,49 +16,65 @@ s3_client = boto3.client('s3')
 sf_client = boto3.client('stepfunctions')
 
 
-def master_report(event, context):
-    # start_time = time.time()
+def report(event, context):
+    return {"status": "de panita","executionArn": "fake:arn:12345678"}
+
+def master_report_wip(event, context):
+    """En este caso cada request corresponde a una solicitud ,
+        pero se podría transformar en una lista de solicitudes para procesos masivos
+    """    # start_time = time.time()
     # event = json.loads(event['body'])
     event =  event['body']
     logger.info(f"--->  {event}" )
-    log = {}
-    customer_list = event.get('customer_list', None)
-    environment = event.get('environment', None)
 
-    def validate_request(event ):
+    def validate_request( event ):
+        """Valida todas las solicitudes antes de procesarlas"""
+        reports_request = event.get('reports_request', None)
 
-        if 'environment' not in  event:
-            raise ValueError(f"❌ environment no ha sido especificado")
-
-        customer_list = event['customer_list']
-        if customer_list :
-
-            #valida los buffers
-            for solicitud in customer_list :
-                if solicitud['buffer_list']:
-                    for buffer in solicitud['buffer_list']:
-                        if buffer not in DEFAULT_BUFFERS :
-                            raise ValueError(f"❌ El buffer ingresado [{buffer}] no esta permitido actualmente, Buffers validos son: {DEFAULT_BUFFERS}")
-                else:
-                    raise ValueError(f"❌ buffer_list no ha sido especificado")
-
-                if 'customer_name' not in  solicitud:
-                    raise ValueError(f"❌ customer_name no ha sido especificado")
-                if 'country_list' not in  solicitud:
-                    raise ValueError(f"❌ country_list no ha sido especificado")
+        if reports_request :
+            for solicitud in reports_request :
+                if 'environment' not in  solicitud:
+                    raise ValueError(f"❌ environment no ha sido especificado")
+                if 'report_name' not in  solicitud:
+                    raise ValueError(f"❌ report_name no ha sido especificado")
+                if 'schema' not in  solicitud:
+                    raise ValueError(f"❌ schema no ha sido especificado")
+                if 'report_to' not in  solicitud:
+                    raise ValueError(f"❌ report_to no ha sido especificado")
+                if 'drop_workflow' not in  solicitud:
+                    raise ValueError(f"❌ drop_workflow no ha sido especificado")
+                if 'buffer_search' not in  solicitud:
+                    raise ValueError(f"❌ buffer_search no ha sido especificado")
+                if 'surface_factor' not in  solicitud:
+                    raise ValueError(f"❌ surface_factor no ha sido especificado")
+                if 'distance_factor' not in  solicitud:
+                    raise ValueError(f"❌ distance_factor no ha sido especificado")
+                if 'start_point' not in  solicitud:
+                    raise ValueError(f"❌ start_point no ha sido especificado")
+                if 'cannibalization_shape' not in  solicitud:
+                    raise ValueError(f"❌ cannibalization_shape no ha sido especificado")
+                if 'substring_id_o_subcadena' not in  solicitud:
+                    raise ValueError(f"❌ substring_id_o_subcadena no ha sido especificado")
+                if 'pois_category_id' not in  solicitud:
+                    raise ValueError(f"❌ pois_category_id no ha sido especificado")
                 if 'etl_list' not in  solicitud:
                     raise ValueError(f"❌ etl_list no ha sido especificado")
-
         else:
-            raise ValueError("❌ customer_list no ha sido especificado")
+            raise ValueError("❌ reports_request no ha sido especificado")
 
         return True
-    
-    try:    
-        if validate_request(event):
-        # if customer_list:
 
-            input_data = {"customer_list":customer_list}
+    try:
+        if validate_request(event):
+
+
+            reports_request = event.get('reports_request', None)
+
+            # if reports_request :
+            #     for solicitud in reports_request :
+
+
+            input_data = {"reports_request":reports_request}
 
             ## llamada a etls en paralelo
             """ Nota : Esta step function si bien se ejecuta correctamente excede podría tardar hasta 30 min por lo que,
@@ -73,10 +89,7 @@ def master_report(event, context):
                 sf_error = sf_response['QueryExecution']['Status']['StateChangeReason']
                 raise Exception(sf_error)
 
-            return {"status": status,"executionArn": execution_arn} 
-        # else:
-        #     raise ValueError("❌ customer_list no ha sido especificado")
-
+            return {"status": status,"executionArn": execution_arn}
 
     except Exception as e:
         e = str(traceback.format_exc())
@@ -158,7 +171,7 @@ def get_download_links(event, context):
                 lista_archivos_por_solicitud = []
                 # Rescatando las solicitudes de la ejecución
                 sf_input = json.loads(response['input'])
-                solicitudes  = sf_input['customer_list']
+                solicitudes  = sf_input['reports_request']
 
                 # Para generar los enlaces de descarga a s3 se itera por cada solicitud y se rescatan sus archivos desde el bucket S3
                 # Las url expiran en x segundos ,ver EXPIRE_URL_SECONDS

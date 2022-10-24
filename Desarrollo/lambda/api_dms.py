@@ -171,7 +171,7 @@ def master_create_buffers(event, context):
                         'buffer': buffer
                     }
                     response = lambda_client.invoke(
-                                FunctionName="reporte-canibalizacion-dev-create-buffer-column",
+                                FunctionName="cannibalization-report-dev-create-buffer-column",
                                 InvocationType="Event",
                                 Payload=json.dumps(  batch  ),
                     )
@@ -216,7 +216,7 @@ def master_migrate_tables(event,context):
         print(table)
         table.update({'environment':environment})
         response = lambda_client.invoke(
-            FunctionName="reporte-canibalizacion-dev-migrate-table",
+            FunctionName="cannibalization-report-dev-migrate-table",
             InvocationType="Event",
             Payload=json.dumps(  table  )
     )
@@ -376,7 +376,7 @@ def api_secuencial_process_table_buffers(event, context):
     payload = {"job_list": job_list}
 
     response = lambda_client.invoke(
-                FunctionName="reporte-canibalizacion-dev-recursive-migrate-tables",
+                FunctionName="cannibalization-report-dev-recursive-migrate-tables",
                 InvocationType="Event",
                 Payload=json.dumps(  payload  ),
     ) 
@@ -433,7 +433,7 @@ def recursive_process_table_buffers(event, context):
             if len(job_list) > 0 :
                 payload = {"job_list": job_list}
                 response = lambda_client.invoke(
-                    FunctionName="reporte-canibalizacion-dev-recursive-migrate-tables",
+                    FunctionName="cannibalization-report-dev-recursive-migrate-tables",
                     InvocationType="Event",
                     Payload=json.dumps(  payload ),
                 )

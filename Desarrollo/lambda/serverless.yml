@@ -1,9 +1,9 @@
-service: reporte-canibalizacion
+service: cannibalization-report
 frameworkVersion: ">=3.12.0"
 
 provider:
   name: aws
-  profile: default
+  profile: tecnologia
   timeout: 900 # The default is 6 seconds. Note: API Gateway current maximum is 30 seconds
   runtime: python3.7
   # deploymentBucket: lambda-modelos
@@ -12,7 +12,7 @@ provider:
     stage: ${opt:stage,'dev'}
     STAGE: ${sls:stage}
     aws_region: us-east-1
-    SERVICE_NAME: "reporte-canibalizacion"
+    SERVICE_NAME: "cannibalization-report"
     PG_TARGET_SCHEMA: "aws_migrations"
     S3_BUCKET_DATALAKE: "georesearch-datalake"
     CREATE_ATHENA_TABLE_LAMBDA_NAME: "worker-athena-create-table"
@@ -24,7 +24,6 @@ provider:
     PREFIX_DMS: ""
     QUERY_LIMIT: ""
     WAITING_TIME_IN_SECONDS: 900
-    SF_01_NAME_PARALLELIZE_ETLS: workflow_${sls:stage}_${self:service}_parallelize_etls
     SF_01_NAME_PARALLELIZE_ETLS: workflow_${sls:stage}_${self:service}_parallelize_etls
     SF_02_NAME_DMS_SERVICE: workflow_${sls:stage}_dms_replicacion
     # 5 dias
@@ -70,7 +69,7 @@ provider:
             - "xray:PutTraceSegment"
             - "xray:PutTraceSegments"
             - "xray:PutTelemetryRecords"
-  apiGateway: 
+  apiGateway:
     description: AG para inputs estudios # optional - description of deployment history
 
     # tracing:
@@ -100,7 +99,7 @@ package:
     # - "Dockerfile"
 
 plugins:
-  - serverless-python-requirements 
+  - serverless-python-requirements
   - serverless-prune-plugin
   - serverless-step-functions
 custom:
@@ -155,7 +154,7 @@ custom:
 #   # Nomenclatura de nombres:  WORKFLOW_<STAGE>_${self:service}_<SF_NAME>
 #   # IMPORTANTE CUIDADO DE PISAR LAS LLAMADA A OTRAS SF , EL STAGE SE SETEA CON : workflow_${self:custom.stage}_
 #   # ej :arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_locales_propios
-#   # Ojo que en el etl 05_consolidar tbn lambda  : arn:aws:lambda:us-east-1:958531303673:function:reporte-canibalizacion-${self:custom.stage}-etl
+#   # Ojo que en el etl 05_consolidar tbn lambda  : arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
 #   stateMachines:
 #     sf_1:
 #       name: workflow_${self:custom.stage}_${self:service}_parallelize_etls
@@ -208,9 +207,9 @@ functions:
 
   master-report:
     # name: ${self:service}-modelv2-${self:custom.stage}
-    description:   ${self:service}  Servicio de creacion de reportes para canibalización  [${self:custom.stage}]
+    description:   ${self:service}  Servicio de creación de reportes de canibalización  [${self:custom.stage}]
     memorySize: 256
-    handler: api_report.master_report
+    handler: api_report.report
     # Maximum retry attempts when an asynchronous invocation fails (between 0 and 2; default: 2)
     maximumRetryAttempts: 0
     layers:
@@ -235,9 +234,9 @@ functions:
         - "requirements.txt"
         - "Dockerfile"
 
-    events: 
+    events:
       - http:
-          path: /master-report
+          path: /report
           method: POST
           integration: lambda
           cors: true
@@ -282,77 +281,3 @@ functions:
     #       path: /
     #       method: get
     #       cors: true
-
-
-    description:   ${self:service} Crea una tabla en Athena dado una query [${self:custom.stage}]
-    memorySize: 500
-    handler: api_etl.handler 
-    # Maximum retry attempts when an asynchronous invocation fails (between 0 and 2; default: 2)
-    maximumRetryAttempts: 0
-    layers:
-      - {Ref: PythonRequirementsLambdaLayer}
-      # - arn:aws:lambda:us-east-1:233683678126:layer:xgboost:3
-      # -  arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py38:2
-      # - arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py37:3
-      - arn:aws:lambda:us-east-1:336392948345:layer:AWSDataWrangler-Python37:5
-    package:
-      # individually: true
-      #  Si desea excluir archivos, puede usar un patrón global con el prefijo ! (https://www.serverless.com/framework/docs/providers/aws/guide/packaging/#patterns)
-      patterns: 
-        # - "!./**/*"
-        - "!*.md"
-        - "sql_queries/**/**/**/*.sql"
-        - "utils/**/**/**/*.py"
-        - "etls/**/**/**/*.py"
-        - "*.zip"
-        - ".requirements.zip"
-        - "*.py"
-        - "*.zip" 
-        - "serverless.yml"
-        - "requirements.txt"
-        - "Dockerfile"
-
-    # events:
-    #   - http:
-    #       path: /
-    #       method: get
-    #       cors: true
-
-    # name: ${self:service}-modelv2-${self:custom.stage}
-    description:   ${self:service} Retorna los enlaces de descarga a los archivos de una solicitude de reportes para estudios [${self:custom.stage}]
-    memorySize: 256
-    handler: api_reportes.get_download_links
-    # Maximum retry attempts when an asynchronous invocation fails (between 0 and 2; default: 2)
-    maximumRetryAttempts: 0
-    layers:
-      - {Ref: PythonRequirementsLambdaLayer}
-      # - arn:aws:lambda:us-east-1:233683678126:layer:xgboost:3
-      # -  arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py38:2
-      # - arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py37:3
-      # - arn:aws:lambda:us-east-1:336392948345:layer:AWSDataWrangler-Python37:5
-    package:
-      # individually: true
-      #  Si desea excluir archivos, puede usar un patrón global con el prefijo ! (https://www.serverless.com/framework/docs/providers/aws/guide/packaging/#patterns)
-      patterns: 
-        # - "!./**/*"
-        - "!*.md"
-        - "utils/**/**/**/*.py"
-        - "etls/**/**/**/*.py"
-        # - "sql_queries/**/**/**/*.sql"
-        - "*.py"
-        - "*.zip"
-        - ".requirements.zip"
-        - "serverless.yml"
-        - "requirements.txt"
-        - "Dockerfile"
-
-    events: 
-      - http:
-          path: /download-links
-          method: POST
-          integration: lambda
-          cors: true
-          private: true
-          response:
-            headers:
-              Content-Type: "'application/json'"

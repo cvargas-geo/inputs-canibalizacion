@@ -22,7 +22,7 @@ if local_deployment== False     :
     EXPIRE_URL_SECONDS =  os.environ['EXPIRE_URL_SECONDS']
 else:
     base_dir = 'C:\GIT\inputs-estudios\Desarrollo\lambda'
-    SERVICE_NAME=   'reporte-canibalizacion'
+    SERVICE_NAME=   'cannibalization-report'
     STAGE =   'dev'
     REGION=   'us-east-1'
     S3_BUCKET_DATALAKE =   'georesearch-datalake'

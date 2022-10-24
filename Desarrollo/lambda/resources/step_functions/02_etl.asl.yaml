@@ -33,7 +33,7 @@ States:
         buffer.$: $.buffer
         etl_name.$: $.etl_name
         parametros.$: $.parametros
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:reporte-canibalizacion-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -73,7 +73,7 @@ States:
         buffer.$: $.buffer
         etl_name.$: $.etl_name
         parametros.$: $.parametros
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:reporte-canibalizacion-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -113,7 +113,7 @@ States:
         buffer.$: $.buffer
         etl_name.$: $.etl_name
         parametros.$: $.parametros
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:reporte-canibalizacion-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -153,7 +153,7 @@ States:
         buffer.$: $.buffer
         etl_name.$: $.etl_name
         parametros.$: $.parametros
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:reporte-canibalizacion-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -180,7 +180,7 @@ States:
         buffer.$: $.buffer
         etl_name.$: $.etl_name
         parametros.$: $.parametros
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:reporte-canibalizacion-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -220,7 +220,7 @@ States:
         buffer.$: $.buffer
         etl_name.$: $.etl_name
         parametros.$: $.parametros
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:reporte-canibalizacion-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -281,7 +281,7 @@ States:
         buffer.$: $.buffer
         etl_name.$: $.etl_name
         parametros.$: $.parametros
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:reporte-canibalizacion-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -321,7 +321,7 @@ States:
         buffer:
           - 0
         parametros.$: $.parametros
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:reporte-canibalizacion-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -361,7 +361,7 @@ States:
         buffer:
           - 0
         parametros.$: $.parametros
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:reporte-canibalizacion-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
