@@ -5,8 +5,8 @@ from etls.consolidar import consolidar
 
 def test_consolidar():
     event = {
-        "customer_name" :"dummy_customer",
-        "country_name"  :"pe",
+        "report_name" :"dummy_customer",
+        "schema"  :"pe",
         "buffer"        :500,
         "drop_workflow" :False 
     }

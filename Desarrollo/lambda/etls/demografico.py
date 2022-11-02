@@ -8,9 +8,9 @@ lambda_client = boto3.client("lambda")
 
 def etl_demografico(event):
     stage = event.get('stage', None)
-    country_name = event.get('country_name', None)
-    customer_name = event.get('customer_name', None)
-    buffer = event.get('buffer', None)
+    schema = event.get('schema', None)
+    report_name = event.get('report_name', None)
+    buffer_search = event.get('buffer_search', None)
     etl_name = event.get('etl_name', None)
     drop_table = event.get('drop_workflow', None)
     parametros = event.get('parametros', None) #TODO VALIDAR ESTE CAMPO
@@ -24,7 +24,7 @@ def etl_demografico(event):
         if stage: 
             if stage == 1 :
                 #Nota el generic_path siempre se obtiene a nivel del stage  
-                generic_path = get_dimanic_sql_path(  etl_name , customer_name, stage)
+                generic_path = get_dimanic_sql_path(  etl_name , report_name, stage)
                 do=True
                 if do :  
                     print(""" Parte 1 de 4 : Se hace la intersección y agregación """)
@@ -33,18 +33,18 @@ def etl_demografico(event):
                         f"{generic_path}01_{etl_name}_{table_name}.sql" , 
                         {
                             'ETL_NAME': etl_name,
-                            'COUNTRY': country_name,
-                            'BUFFER': buffer ,
-                            'CUSTOMER_NAME':customer_name,
-                            'parametros':parametros['demografico'][country_name]
+                            'COUNTRY': schema,
+                            'BUFFER': buffer_search ,
+                            'report_name':report_name,
+                            'parametros':parametros['demografico'][schema]
                         }
                     )
                     
-                    custom_table_name = f"{customer_name}_{country_name}_{etl_name}_{table_name}_b{buffer}"
+                    custom_table_name = f"{report_name}_{schema}_{etl_name}_{table_name}_b{buffer}"
                     task_1 = {
                       "task_name": f" Parte 1 de 4 : {table_name}",
                       "worker_parameters": {
-                                "customer_name": customer_name,
+                                "report_name": report_name,
                                 "table_name": custom_table_name, 
                                 "sql_query": sql_querie,
                                 "drop_table": drop_table
@@ -60,19 +60,19 @@ def etl_demografico(event):
                         f"{generic_path}02_{etl_name}_{table_name}.sql" , 
                         {
                             'ETL_NAME': etl_name,
-                            'COUNTRY': country_name,
-                            'BUFFER': buffer ,
-                            'CUSTOMER_NAME':customer_name,
-                            'parametros':parametros['demografico'][country_name]
+                            'COUNTRY': schema,
+                            'BUFFER': buffer_search ,
+                            'report_name':report_name,
+                            'parametros':parametros['demografico'][schema]
                         }
                     )
                     
-                    custom_table_name = f"{customer_name}_{country_name}_{etl_name}_{table_name}_b{buffer}"
+                    custom_table_name = f"{report_name}_{schema}_{etl_name}_{table_name}_b{buffer}"
                     
                     task_2 = {
                           "task_name": f" Parte 2 de 4  : {table_name}",
                           "worker_parameters": {
-                                    "customer_name": customer_name,
+                                    "report_name": report_name,
                                     "table_name": custom_table_name, 
                                     "sql_query": sql_querie,
                                     "drop_table": drop_table
@@ -88,19 +88,19 @@ def etl_demografico(event):
                         f"{generic_path}03_{etl_name}_{table_name}.sql" , 
                         {
                             'ETL_NAME': etl_name,
-                            'COUNTRY': country_name,
-                            'BUFFER': buffer ,
-                            'CUSTOMER_NAME':customer_name,
-                            'parametros':parametros['demografico'][country_name]
+                            'COUNTRY': schema,
+                            'BUFFER': buffer_search ,
+                            'report_name':report_name,
+                            'parametros':parametros['demografico'][schema]
                             
                         }
                     )
                     
-                    custom_table_name = f"{customer_name}_{country_name}_{etl_name}_{table_name}_b{buffer}"
+                    custom_table_name = f"{report_name}_{schema}_{etl_name}_{table_name}_b{buffer}"
                     task_3 = {
                           "task_name": f" Parte 3 de 4   : {table_name}",
                           "worker_parameters": {
-                                    "customer_name": customer_name,
+                                    "report_name": report_name,
                                     "table_name": custom_table_name, 
                                     "sql_query": sql_querie,
                                     "drop_table": drop_table
@@ -115,14 +115,14 @@ def etl_demografico(event):
                 
             if stage == 2 :
                 #Nota el generic_path siempre se obtiene a nivel del stage  
-                generic_path = get_dimanic_sql_path(  etl_name , customer_name, stage)
+                generic_path = get_dimanic_sql_path(  etl_name , report_name, stage)
                 do=True
                 if do :
                     print(""" Stage 2 de 2 : Consulta final de datos demográficos""")
                     
                     #Se agregan aca los atractores
                     atractor_rule = read_templated_file(
-                        f"{generic_path}atractor_rule.{country_name}.sql"   
+                        f"{generic_path}atractor_rule.{schema}.sql"   
                     )
                     
                     table_name = 'final'
@@ -130,19 +130,19 @@ def etl_demografico(event):
                         f"{generic_path}04_{table_name}.sql" , 
                         {
                             'ETL_NAME': etl_name,
-                            'COUNTRY': country_name,
-                            'BUFFER': buffer ,
-                            'CUSTOMER_NAME':customer_name,
+                            'COUNTRY': schema,
+                            'BUFFER': buffer_search ,
+                            'report_name':report_name,
                             'atractor_rule':atractor_rule
                         }
                     )
                     
                     # no se coloca el nombre_etl pues ya es el ultimo paso
-                    custom_table_name = f"{customer_name}_{country_name}_{etl_name}_{table_name}_b{buffer}"
+                    custom_table_name = f"{report_name}_{schema}_{etl_name}_{table_name}_b{buffer}"
                     task_4 = {
                           "task_name": f" Stage 2 de 2   : {table_name}",
                           "worker_parameters": {
-                                    "customer_name": customer_name,
+                                    "report_name": report_name,
                                     "table_name": custom_table_name, 
                                     "sql_query": sql_querie,
                                     "drop_table": drop_table
@@ -157,7 +157,7 @@ def etl_demografico(event):
                 '''             
                 if stage == 3:
                 #Nota el generic_path siempre se obtiene a nivel del stage  
-                generic_path = get_dimanic_sql_path(  etl_name , customer_name, stage)
+                generic_path = get_dimanic_sql_path(  etl_name , report_name, stage)
                 do=True
                 if do :
                     print(""" Parte 4 de 4 : Consulta final de datos demográficos""")
@@ -167,18 +167,18 @@ def etl_demografico(event):
                         f"{generic_path}04_{table_name}.sql" , 
                         {
                             'ETL_NAME': etl_name,
-                            'COUNTRY': country_name,
-                            'BUFFER': buffer ,
-                            'CUSTOMER_NAME':customer_name
+                            'COUNTRY': schema,
+                            'BUFFER': buffer_search ,
+                            'report_name':report_name
                         }
                     )
                     
                     # no se coloca el nombre_etl pues ya es el ultimo paso
-                    custom_table_name = f"{customer_name}_{country_name}_{etl_name}_b{buffer}"
+                    custom_table_name = f"{report_name}_{schema}_{etl_name}_b{buffer}"
                     task_4 = {
                         "task_name": f" Parte 4 de 4   : {table_name}",
                         "worker_parameters": {
-                                    "customer_name": customer_name,
+                                    "report_name": report_name,
                                     "table_name": custom_table_name, 
                                     "sql_query": sql_querie,
                                     "drop_table": drop_table

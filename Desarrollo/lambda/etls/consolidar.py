@@ -21,9 +21,9 @@ s3_client_resource = boto3.resource('s3')
 
 def etl_consolidar(event): 
     stage = event.get('stage', None)
-    country_name = event.get('country_name', None)
-    customer_name = event.get('customer_name', None)
-    buffer = event.get('buffer', None)
+    schema = event.get('schema', None)
+    report_name = event.get('report_name', None)
+    buffer_search = event.get('buffer_search', None)
     drop_table = event.get('drop_workflow', None)
     # id_gastos = event.get('id_gastos', None) #TODO VALIDAR ESTE CAMPO
     parametros = event.get('parametros', None) #Reemplaza a id_gastos
@@ -36,21 +36,21 @@ def etl_consolidar(event):
         base_dir = os.getcwd()
         sql_queries_dir = f"{base_dir}/sql_queries/athena/" 
         # id_gastos es obligatorio, en ese caso la key gastos no depende el etl_name
-        # id_gastos = parametros['gastos'][country_name]['id_gastos']
+        # id_gastos = parametros['gastos'][schema]['id_gastos']
         etapa1=True
         etapa2=True 
 
         if stage: 
             if stage == 1 :
                 #Nota el generic_path siempre se obtiene a nivel del stage  
-                generic_path = get_dimanic_sql_path(  etl_name , customer_name, stage)
+                generic_path = get_dimanic_sql_path(  etl_name , report_name, stage)
                 if etapa1 :  
                     print(" Parte 1 de 1 : Consolidación de los etls")
                     table_name = etl_name 
 
                     sql_querie  = get_consolidate_table_with_header(
-                        customer_name  , 
-                        country_name ,
+                        report_name  , 
+                        schema ,
                         buffer,
                         TARGET_DB,
                         table_name=table_name,
@@ -60,13 +60,13 @@ def etl_consolidar(event):
                         ) if drop_table == False else  '--No hay tabla que consultar'
                     assert sql_querie is not None , f"Error al formar la consulta para {etl_name} "
 
-                    custom_table_name = f"{customer_name}_{country_name}_{table_name}_b{buffer}"
+                    custom_table_name = f"{report_name}_{schema}_{table_name}_b{buffer}"
                     print(f"A crear tabla con : {sql_querie}")
                     
                     task_1 = {
                     "task_name": f" Parte 1 de 1 : Consolidación de los etls: {custom_table_name}",
                     "worker_parameters": {
-                                "customer_name": customer_name,
+                                "report_name": report_name,
                                 "table_name": custom_table_name, 
                                 "sql_query": sql_querie,
                                 "drop_table": drop_table
@@ -87,8 +87,8 @@ def etl_consolidar(event):
 
                     Definición del bucket de salida :
                     
-                    {customer_name}_inputs
-                        {customer_name}_{country_name}_b{buffer}
+                    {report_name}_inputs
+                        {report_name}_{schema}_b{buffer}
                         ...
                         ..
                         .
@@ -96,9 +96,9 @@ def etl_consolidar(event):
                     """
                     #IMPORTANTE ESTE PREFIJO DEBE COINCIDIR CON (***)  pues se deben borrar todos los indices si existieran
                     # tbn se ocupa para renombrar los archivos que seran movidos 
-                    OUTPUT_FILE_NAME = f"{customer_name}_{country_name}_b{buffer}_"
+                    OUTPUT_FILE_NAME = f"{report_name}_{schema}_b{buffer}_"
                     #TODO S3_STAGE VA DEPENDER DEL ENVIRONMENT
-                    custom_s3_output=f"{s3_prefix_delivery_output_data}{customer_name}_inputs/{OUTPUT_FILE_NAME}"
+                    custom_s3_output=f"{s3_prefix_delivery_output_data}{report_name}_inputs/{OUTPUT_FILE_NAME}"
                     print(f"⚠️ Se eliminaran los archivos de: {custom_s3_output}"  )
                     s3_response = s3_client.list_objects_v2(Bucket= S3_BUCKET_DATALAKE, Prefix = custom_s3_output )
                     
@@ -107,7 +107,7 @@ def etl_consolidar(event):
                         if len(s3_response["Contents"]) > 0 :
                             print(f"Existen {len(s3_response['Contents'])} archivos por eliminar .... "  ) 
                             for object in s3_response['Contents']:
-                                # if f"{customer_name}_{country_name}_b{buffer}_" in object['Key'] : 
+                                # if f"{report_name}_{schema}_b{buffer}_" in object['Key'] : 
                                 print('🗑️ Eliminando : ', object['Key'])
                                 s3_client.delete_object(Bucket=S3_BUCKET_DATALAKE, Key=object['Key'])
                     else:
@@ -119,7 +119,7 @@ def etl_consolidar(event):
                     else  :
                         #TABLA A CONSULTAR
                         #dummy_customer_pe_consolidar_b500
-                        custom_table_name = f"{customer_name}_{country_name}_{etl_name}_b{buffer}"
+                        custom_table_name = f"{report_name}_{schema}_{etl_name}_b{buffer}"
                         source_prefix = s3_prefix_etl_output_data + custom_table_name
                         
                         ##copia la tabla consolidada a un bucket de salida como un archivo .csv.gz cambiando el nombre al archivo
@@ -134,14 +134,14 @@ def etl_consolidar(event):
                                 for index , obj in  enumerate(s3_response["Contents"]):
                                     copy_source = {'Bucket': S3_BUCKET_DATALAKE, 'Key': obj["Key"]}
                                     # (***) Nombre final del archivo de salida
-                                    s3_target_key = f"{s3_prefix_delivery_output_data}{customer_name}_inputs/{OUTPUT_FILE_NAME}{ index + 1 }.csv.gz"
+                                    s3_target_key = f"{s3_prefix_delivery_output_data}{report_name}_inputs/{OUTPUT_FILE_NAME}{ index + 1 }.csv.gz"
                                     print(f"Moviendo: {obj['Key']} a {s3_target_key}")
                                     s3_client.copy_object(Bucket = S3_BUCKET_DATALAKE, CopySource = copy_source, Key = s3_target_key)
                             else:
                                 print(f"Bucket vacío ✨")
                                 raise Exception("Error al eliminar , No puede estar vació el bucket, favor revisar el proceso de consolidación ")
                             
-                        result['generar_csv'] = f'✔️ Archivos generados correctamente en: {s3_prefix_delivery_output_data}{customer_name}_inputs/'
+                        result['generar_csv'] = f'✔️ Archivos generados correctamente en: {s3_prefix_delivery_output_data}{report_name}_inputs/'
 
                         return result
         else:
@@ -151,7 +151,7 @@ def etl_consolidar(event):
         print(e) 
         return {"error": e }
 
-def get_consolidate_table_with_header( customer_name  , country_name , buffer , TARGET_DB ,table_name,etl_name , generic_path , parametros=None):
+def get_consolidate_table_with_header( report_name  , schema , buffer_search , TARGET_DB ,table_name,etl_name , generic_path , parametros=None):
     """ retorna una consulta sql que obtiene las columnas las tablas de cada etl anterior,
     y así generar una consulta dinámica. Todas las columnas se castearan a varchar y se agregan en duro las columnas. 
     
@@ -164,16 +164,16 @@ def get_consolidate_table_with_header( customer_name  , country_name , buffer , 
         columnas_competencias = []
         
         df_demografico = wr.athena.read_sql_query(
-                    sql=f"SELECT * FROM {TARGET_DB}.{customer_name}_{country_name}_demografico_final_b{buffer} LIMIT 0",
+                    sql=f"SELECT * FROM {TARGET_DB}.{report_name}_{schema}_demografico_final_b{buffer} LIMIT 0",
                     use_threads =True,
                     database=TARGET_DB
         ) 
         columnas_demografico = list(set(df_demografico.columns))
 
 
-        if 'id_gastos' in parametros['gastos'][country_name]   : 
+        if 'id_gastos' in parametros['gastos'][schema]   : 
             df_gastos = wr.athena.read_sql_query(
-                        sql=f"SELECT * FROM {TARGET_DB}.{customer_name}_{country_name}_gastos_final_b{buffer} LIMIT 0",
+                        sql=f"SELECT * FROM {TARGET_DB}.{report_name}_{schema}_gastos_final_b{buffer} LIMIT 0",
                         use_threads =True,
                         database=TARGET_DB
             )
@@ -181,10 +181,10 @@ def get_consolidate_table_with_header( customer_name  , country_name , buffer , 
             columnas_gastos.remove('geo_id') 
 
 
-        if (   'category_id' in parametros['competencias'][country_name]   or 
-               'substring_id' in parametros['competencias'][country_name]  )  : 
+        if (   'category_id' in parametros['competencias'][schema]   or 
+               'substring_id' in parametros['competencias'][schema]  )  : 
             df_competencias = wr.athena.read_sql_query(
-                        sql=f"SELECT * FROM {TARGET_DB}.{customer_name}_{country_name}_competencias_final_b{buffer} LIMIT 0",
+                        sql=f"SELECT * FROM {TARGET_DB}.{report_name}_{schema}_competencias_final_b{buffer} LIMIT 0",
                         use_threads =True,
                         database=TARGET_DB
             )
@@ -194,9 +194,9 @@ def get_consolidate_table_with_header( customer_name  , country_name , buffer , 
         
         params = {
             'TARGET_DB': TARGET_DB, 
-            'COUNTRY': country_name,
-            'BUFFER': buffer ,
-            'CUSTOMER_NAME':customer_name,
+            'COUNTRY': schema,
+            'BUFFER': buffer_search ,
+            'report_name':report_name,
             'columnas_demografico' : columnas_demografico,
             'columnas_gastos' : columnas_gastos,
             'columnas_competencias' : columnas_competencias,

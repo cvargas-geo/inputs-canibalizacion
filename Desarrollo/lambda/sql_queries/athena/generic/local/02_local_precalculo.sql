@@ -166,7 +166,7 @@ WITH
         ST_intersects(
             ST_GeometryFromText(p.shape_wkt), 
             -- ST_GeometryFromText(b.buffer_1500) 
-            /*Pseudo buffer no es 100% circular , se alarga en los polos ,  pero es una buena aproximacion pues respeta el radio*/
+            /*Pseudo buffer_search no es 100% circular , se alarga en los polos ,  pero es una buena aproximacion pues respeta el radio*/
             ST_Buffer(
                 ST_GeometryFromText( b.shape  ) ,
                     30000.0 * 360.0 / (2.0 * pi() * cos( radians(ST_Y(b.shape )) )* 6400000.0)    

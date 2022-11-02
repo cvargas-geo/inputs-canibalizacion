@@ -43,7 +43,7 @@ def alter_table(target_schema, target_table  ,buffer_size):
     
 def update_table(source_schema, source_table  ,  target_schema, target_table , buffer_size):
     """
-    Update buffer column of table in the database.
+    Update buffer_search column of table in the database.
     """
     conn = make_conn(db_secret)
     custom_on_clause = get_custom_on_clause_for_table(source_table) 
@@ -61,7 +61,7 @@ def update_table(source_schema, source_table  ,  target_schema, target_table , b
 
 def get_custom_columns_for_table(table_name ):
     """
-    Return a custom columns given a table to be inclued in te buffer table .
+    Return a custom columns given a table to be inclued in te buffer_search table .
     """
     if table_name == 'view_blocks' : 
         custom_columns = """
@@ -85,7 +85,7 @@ def get_custom_columns_for_table(table_name ):
 
 def get_custom_on_clause_for_table(table_name ):
     """
-    Return a custom on clause given a table to be inclued in te buffer table .
+    Return a custom on clause given a table to be inclued in te buffer_search table .
     """
     if table_name == 'view_blocks' : 
         custom_on_clause = """
@@ -103,7 +103,7 @@ def get_custom_on_clause_for_table(table_name ):
 
 def get_custom_buffer_for_table(table_name , buffer_size ):
     """
-    Return a custom buffer given a table to be inclued in te buffer table .
+    Return a custom buffer_search given a table to be inclued in te buffer_search table .
     Some tables have a custom coords by lat long or direcly a shape or point 
     """
     if table_name == 'view_blocks' : 

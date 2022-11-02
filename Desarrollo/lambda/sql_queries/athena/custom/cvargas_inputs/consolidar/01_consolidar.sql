@@ -30,8 +30,8 @@ SELECT
     {% endfor %}
 
 /*DEMOGRAFICO*/
-FROM {{params.TARGET_DB}}.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_demografico_final_b{{params.BUFFER}} D
+FROM {{params.TARGET_DB}}.{{params.report_name}}_{{params.COUNTRY}}_demografico_final_b{{params.BUFFER}} D
 /*GASTOS*/ 
-FULL OUTER JOIN {{params.TARGET_DB}}.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_gastos_final_b{{params.BUFFER}} G  ON G.geo_id = D.geo_id
+FULL OUTER JOIN {{params.TARGET_DB}}.{{params.report_name}}_{{params.COUNTRY}}_gastos_final_b{{params.BUFFER}} G  ON G.geo_id = D.geo_id
 /*COMPETENCIAS*/ 
-FULL OUTER JOIN {{params.TARGET_DB}}.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_competencias_final_b{{params.BUFFER}} C  ON C.geo_id = D.geo_id
+FULL OUTER JOIN {{params.TARGET_DB}}.{{params.report_name}}_{{params.COUNTRY}}_competencias_final_b{{params.BUFFER}} C  ON C.geo_id = D.geo_id

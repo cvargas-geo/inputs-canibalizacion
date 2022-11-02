@@ -101,7 +101,7 @@ States:
                               Resource: arn:aws:states:::states:startExecution.sync:2
                               Parameters:
                                 StateMachineArn: >-
-                                  arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_consolidar
+                                  arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}cconsolidar
                                 Input.$: $
                               End: true
                               ResultSelector:

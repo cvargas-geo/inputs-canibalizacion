@@ -16,7 +16,7 @@ WITH
 	
 		SELECT
 			p.id,
-            /*Pseudo buffer no es 100% circular , se alarga en los polos ,  pero es una buena aproximacion pues respeta el radio*/
+            /*Pseudo buffer_search no es 100% circular , se alarga en los polos ,  pero es una buena aproximacion pues respeta el radio*/
             ST_Buffer(
                 ST_GeometryFromText( P.shape_wkt ) ,
                     {{params.search_distance_in_meters}}.0 * 360.0 / (2.0 * pi() * cos( radians(ST_Y(P.shape_wkt )) )* 6400000.0)    

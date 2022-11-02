@@ -17,7 +17,7 @@ States:
         StringMatches: locales_propios
         Next: LP ETAPA 1
     Comment: >-
-      {       "schema": "pe",  
+      {       "schema": "pe",
       "drop_workflow": false,   "report_name": "dummy_customer",   "buffer_search":
       4000,   "etl_name": "gastos" }
   C ETAPA 1:
@@ -26,14 +26,14 @@ States:
     Parameters:
       Payload:
         stage: 1
-        
+
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name
         buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-        
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
+
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -66,14 +66,12 @@ States:
     Parameters:
       Payload:
         stage: 2
-        
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name
         buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-        
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -106,14 +104,12 @@ States:
     Parameters:
       Payload:
         stage: 1
-        
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name
         buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-        
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -146,14 +142,12 @@ States:
     Parameters:
       Payload:
         stage: 2
-        
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name
         buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-        
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -173,14 +167,12 @@ States:
     Parameters:
       Payload:
         stage: 1
-        
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name
         buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-        
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -220,7 +212,7 @@ States:
         buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
         
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -281,7 +273,7 @@ States:
         buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
         
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -321,7 +313,7 @@ States:
         buffer_search:
           - 0
         
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -361,7 +353,7 @@ States:
         buffer_search:
           - 0
         
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException

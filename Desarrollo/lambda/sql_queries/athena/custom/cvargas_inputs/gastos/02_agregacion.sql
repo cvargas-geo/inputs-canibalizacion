@@ -17,7 +17,7 @@ WITH BASE AS (
 			END AS gasto_gse{{range(params.max_gse)| length  }}
 		 
 
-	FROM  prod_inputs_estudios.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_gastos_intersect_blocks_buffers_b{{params.BUFFER}}  bs 
+	FROM  prod_inputs_estudios.{{params.report_name}}_{{params.COUNTRY}}_gastos_intersect_blocks_buffers_b{{params.BUFFER}}  bs 
 	INNER JOIN  prod_countries.country_{{params.COUNTRY}}_view_gastos  AS g ON g.id_recoba = bs.recoba_id 
 	INNER JOIN  prod_countries.country_{{params.COUNTRY}}_income_levels AS il ON il.id = g.id_gse 
 	WHERE g.nombre in ( '{{ params.CANASTA.upper() }}') /* nota iterar por canasta y agregar todas las columas con nuevos nombres  */

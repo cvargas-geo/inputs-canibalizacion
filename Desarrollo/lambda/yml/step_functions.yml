@@ -27,13 +27,13 @@ stateMachines:
 #         ${file(./resources/step_functions/03_parallelize_locales_propios.asl.yaml)}
 #       tracingConfig:
 #         enabled: true
-#     sf_4:
-#       name: workflow_${self:custom.stage}_${self:service}_parallelize_workers
-#       role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
-#       definition:
-#         ${file(./resources/step_functions/04_parallelize_workers.asl.yaml)}
-#       tracingConfig:
-#         enabled: true
+  sf_4:
+    name: workflow_${self:custom.stage}_${self:service}_parallelize_workers
+    role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
+    definition:
+      ${file(./resources/step_functions/04_parallelize_workers.asl.yaml)}
+    tracingConfig:
+      enabled: true
 #     sf_5:
 #       name: workflow_${self:custom.stage}_${self:service}_consolidar
 #       role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8

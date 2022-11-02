@@ -57,13 +57,13 @@ SELECT
     {%  endif %}
 /*split_for_comma*/
 /*DEMOGRAFICO*/
-FROM {{params.TARGET_DB}}.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_demografico_final_b{{params.BUFFER}} D
+FROM {{params.TARGET_DB}}.{{params.report_name}}_{{params.COUNTRY}}_demografico_final_b{{params.BUFFER}} D
 
 {# AGREGAR O NO GASTOS  #}
 {%  if  params.parametros['gastos'][params.COUNTRY].id_gastos is defined   %}
 
 /*GASTOS*/ 
-LEFT JOIN {{params.TARGET_DB}}.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_gastos_final_b{{params.BUFFER}} G  ON G.geo_id = D.geo_id
+LEFT JOIN {{params.TARGET_DB}}.{{params.report_name}}_{{params.COUNTRY}}_gastos_final_b{{params.BUFFER}} G  ON G.geo_id = D.geo_id
 
 {%  endif %}
 
@@ -73,7 +73,7 @@ LEFT JOIN {{params.TARGET_DB}}.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_gasto
 %}
 
 /*COMPETENCIAS*/ 
-LEFT JOIN {{params.TARGET_DB}}.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_competencias_final_b{{params.BUFFER}} C  ON C.geo_id = D.geo_id
+LEFT JOIN {{params.TARGET_DB}}.{{params.report_name}}_{{params.COUNTRY}}_competencias_final_b{{params.BUFFER}} C  ON C.geo_id = D.geo_id
 
 {%  endif %}
 

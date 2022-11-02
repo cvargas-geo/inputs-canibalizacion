@@ -55,9 +55,9 @@
             BB.longitud longitud_mz ,
             BB.latitud latitud_mz
             /* step_customer_co_demografico_intersect_blocks_buffers_b600 */
-        FROM      prod_inputs_estudios.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_demografico_intersect_blocks_buffers_b{{params.BUFFER}}     A
-        LEFT JOIN prod_inputs_estudios.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_demografico_intersect_pois_buffers_b{{params.BUFFER}}       CS ON CS.geo_id = A.geo_id
-        LEFT JOIN prod_inputs_estudios.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_demografico_intersect_empresas_buffers_b{{params.BUFFER}}   E ON E.geo_id = A.geo_id
+        FROM      prod_inputs_estudios.{{params.report_name}}_{{params.COUNTRY}}_demografico_intersect_blocks_buffers_b{{params.BUFFER}}     A
+        LEFT JOIN prod_inputs_estudios.{{params.report_name}}_{{params.COUNTRY}}_demografico_intersect_pois_buffers_b{{params.BUFFER}}       CS ON CS.geo_id = A.geo_id
+        LEFT JOIN prod_inputs_estudios.{{params.report_name}}_{{params.COUNTRY}}_demografico_intersect_empresas_buffers_b{{params.BUFFER}}   E ON E.geo_id = A.geo_id
         LEFT JOIN prod_countries.country_{{params.COUNTRY}}_view_blocks_buffers BB  ON  BB.block_id = A.geo_id  
     )
 

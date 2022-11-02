@@ -12,7 +12,7 @@ FROM
     {% if index > 0 %}
     FULL OUTER JOIN
     {% endif %}
-    {{params.TARGET_DB}}.{{params.CUSTOMER_NAME}}_{{params.COUNTRY}}_gastos_agregacion_{{params.lista_canastas[index].lower()}}_b{{params.BUFFER}} G{{index}} 
+    {{params.TARGET_DB}}.{{params.report_name}}_{{params.COUNTRY}}_gastos_agregacion_{{params.lista_canastas[index].lower()}}_b{{params.BUFFER}} G{{index}} 
     {% if index > 0 %}
     ON G{{ index-1 }}.geo_id = G{{ index }}.geo_id
     {% endif %}

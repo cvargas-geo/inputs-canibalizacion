@@ -77,9 +77,9 @@ DEFAULT_BUFFERS = [
 """ Lista de solicitudes desde plaforma MG """
 history_customer_list  = read_json_file(f"{base_dir}/utils/history_customer_list.json")
 
-def get_dimanic_sql_path( etl_name , customer_name, stage ,history_customer_list =history_customer_list ):
+def get_dimanic_sql_path( etl_name , report_name, stage ,history_customer_list =history_customer_list ):
         """
-        Retorna el path de la query dependiendo si ( customer_name , etl_name y stage ) están en la lista de históricos. 
+        Retorna el path de la query dependiendo si ( report_name , etl_name y stage ) están en la lista de históricos. 
         IMPORTANTE :
             - El controlador de cada etl no debería ser modificado si se necesita agregar un nuevo customer a la lista , 
         pues se diseño para que independiente de la solicitud, pueda reutilizar la automatización pero con los nuevos cambios de las queries.
@@ -109,22 +109,22 @@ def get_dimanic_sql_path( etl_name , customer_name, stage ,history_customer_list
                     El etl gastos fue modificado en/los stage/s 1, y 2 
             
             Por lo que los stages reflejaran las nuevas consultas editadas,
-            estas deberán ir en la ruta {base_dir}/sql_queries/athena/custom/<customer_name>/<etl_names>/0<stage>_<table_name>.sql
+            estas deberán ir en la ruta {base_dir}/sql_queries/athena/custom/<report_name>/<etl_names>/0<stage>_<table_name>.sql
             """
         sql_queries_dir = f"{base_dir}/sql_queries/athena/"
 
         sql_path =  ''
         # si el stage , etl y nombre del customer esta en el historial de solicitudes retorna el path dinamico, sino se utilizan las consultas genericas ya creadas.
         if (
-            customer_name in history_customer_list.keys() and
-            etl_name      in history_customer_list[customer_name].keys() and 
-            stage         in history_customer_list[customer_name][etl_name]['stages']
+            report_name in history_customer_list.keys() and
+            etl_name      in history_customer_list[report_name].keys() and 
+            stage         in history_customer_list[report_name][etl_name]['stages']
         ):  
-            print(f"Tipo 2️⃣: Consulta dinámica para {customer_name}/{etl_name}/ stage {stage}")
+            print(f"Tipo 2️⃣: Consulta dinámica para {report_name}/{etl_name}/ stage {stage}")
             # custom_path :  Query a medida para el reporte o país  :  CUANDO EL FORMATO DE LA SOLICITUD NO COINCIDE CON LA BASE
-            sql_path = f"{sql_queries_dir}custom/{customer_name}/{etl_name}/"
+            sql_path = f"{sql_queries_dir}custom/{report_name}/{etl_name}/"
         else : 
-            print(f"Tipo 1️⃣: Consulta genérica para {customer_name}/{etl_name}/ stage {stage}")
+            print(f"Tipo 1️⃣: Consulta genérica para {report_name}/{etl_name}/ stage {stage}")
             # generic_path : Querys genéricas :  CUANDO EL FORMATO DE LAS SOLICITUD COINCIDE PARA CUALQUIER PAÍS O REPORTE 
             sql_path = f"{sql_queries_dir}generic/{etl_name}/"
 

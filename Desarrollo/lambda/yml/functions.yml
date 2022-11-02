@@ -38,10 +38,47 @@ master-report:
           headers:
             Content-Type: "'application/json'"
 
+
+etl:
+  description:   ${self:service} Crea una tabla en Athena para los inputs de estudios [${self:custom.stage}]
+  memorySize: 256
+  handler: api_etl.handler
+  # Maximum retry attempts when an asynchronous invocation fails (between 0 and 2; default: 2)
+  maximumRetryAttempts: 0
+  layers:
+    - {Ref: PythonRequirementsLambdaLayer}
+    # - arn:aws:lambda:us-east-1:233683678126:layer:xgboost:3
+    # -  arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py38:2
+    # - arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py37:3
+    - arn:aws:lambda:us-east-1:336392948345:layer:AWSDataWrangler-Python37:5
+  package:
+    # individually: true
+    #  Si desea excluir archivos, puede usar un patrón global con el prefijo ! (https://www.serverless.com/framework/docs/providers/aws/guide/packaging/#patterns)
+    patterns: 
+      # - "!./**/*"
+      - "!*.md"
+      - "sql_queries/**/**/**/*.sql"
+      - "utils/**/**/**/*.py"
+      - "etls/**/**/**/*.py"
+      - "*.zip"
+      - ".requirements.zip"
+      - "*.py"
+      - "*.zip" 
+      - "serverless.yml"
+      - "requirements.txt"
+      - "Dockerfile"
+
+  # events:
+  #   - http:
+  #       path: /
+  #       method: get
+  #       cors: true
+
+
 worker-athena-create-table:
   # name: ${self:service}-modelv2-${self:custom.stage}
   description:   ${self:service} Crea una tabla en Athena [${self:custom.stage}]
-  memorySize: 500
+  memorySize: 256
   handler: api_report.worker_athena_create_table
   # Maximum retry attempts when an asynchronous invocation fails (between 0 and 2; default: 2)
   maximumRetryAttempts: 0

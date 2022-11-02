@@ -175,16 +175,16 @@ def get_download_links(event, context):
                 #TODO EXPIRE_URL_SECONDS debería leerse desde serverless.yaml
                 for solicitud in solicitudes:
 
-                    customer_name = solicitud['customer_name']
+                    report_name = solicitud['report_name']
                     # print(solicitud)
 
                     files_by_solicitud =[] 
 
                     # consulta por los archivos en el bucket correspondiente de la solicitud ,
-                    # recordar que se le agrego "_inputs" al final de customer_name al momento de guardar 
+                    # recordar que se le agrego "_inputs" al final de report_name al momento de guardar 
                     # source_prefix ya lleva /
-                    s3_response = s3_client.list_objects_v2(Bucket= S3_BUCKET_DATALAKE, Prefix = f"{source_prefix}{customer_name}_inputs/" )
-                    print(S3_BUCKET_DATALAKE  , f"{source_prefix}/{customer_name}_inputs/", s3_response  )
+                    s3_response = s3_client.list_objects_v2(Bucket= S3_BUCKET_DATALAKE, Prefix = f"{source_prefix}{report_name}_inputs/" )
+                    print(S3_BUCKET_DATALAKE  , f"{source_prefix}/{report_name}_inputs/", s3_response  )
                     # un orden de la salida
                     files = sorted(s3_response['Contents'],key=lambda i:i['Key'],reverse=True)  
 
@@ -218,7 +218,7 @@ def get_download_links(event, context):
                     # result = {'url_list':url_list}
 
                     #aca se genera el detalle por cada solicitud junto a sus urls
-                    lista_archivos_por_solicitud.append({'customer_name':customer_name,'url_list':url_list})
+                    lista_archivos_por_solicitud.append({'report_name':report_name,'url_list':url_list})
                     
                 
                 # print(json.dumps(lista_archivos_por_solicitud ,  indent=4) )
