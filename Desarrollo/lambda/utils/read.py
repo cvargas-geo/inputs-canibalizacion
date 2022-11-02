@@ -7,7 +7,14 @@ def read_file(file_path) :
     return open(file_path ,"r").read()
 
 
-def read_templated_file(file_path  , obj ) :
+def resolve_stage_db(environment) :
+    """Apunta a la base de datos correspondiente del para el proyecto (Athena) sufijo : qa /prod"""
+    if environment == 'PROD' or environment =='prod' :
+        return 'prod'
+    else:
+        return 'qa'
+
+def read_templated_file(file_path  , params ) :
     """ Dada una ruta de archivo de texto y un objeto,
     retorna una consulta con los parámetros reemplazados
      doc util:
@@ -18,7 +25,7 @@ def read_templated_file(file_path  , obj ) :
     file = read_file(file_path)
     # print(file)
     #, undefined=StrictUndefined avisa si una variable no esta definida
-    templed_sql = Template(file , undefined=StrictUndefined).render(obj)
+    templed_sql = Template(file , undefined=StrictUndefined).render(params)
     # print(templed_sql)
     return templed_sql.replace("\n", " ").replace("\t", " ")
 

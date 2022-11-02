@@ -41,7 +41,7 @@ def create_table(table_name, target_db , sql_query  , drop_table=False  ):
             if drop_table == False :  
                 logger.info(f"🚀 A ejecutar : \n{sql_query}") 
                 dll_querie = read_templated_file(
-                    file_path=f'{sql_queries_dir}/generic/create_table/create_{TABLE_FORMAT}_table.sql', 
+                    file_path=f'{sql_queries_dir}/generic/create_table/create_{TABLE_FORMAT}_table.sql',
                     params={
                         'table_name':table_name ,  
                         'target_db':target_db , 
@@ -114,39 +114,38 @@ def create_table_original(table_name, target_db , sql_query  , drop_table=False 
         3 :  crea nuevamente la tabla en el glue catalog y los datos quedan alojados en s3
         Retorna True si todo salio bien
         drop_table :  si es True , solo elimina la tabla
-        
-    """ 
+    """
     try :
         # valida que las variables no sean nulas o vacías
         if not [x for x in (locals()) if x  == '' or x is None] :
 
             assert delete_table( target_db , table_name )  == True , "Error al eliminar la tabla del glue catalog"
             assert delete_s3_data( table_name )  == True , "Error al eliminar los datos de tabla en s3"
-            
+
             TABLE_FORMAT ='csv'
             logger.info(f"⚽ DDL DROP MODE  : {drop_table}") 
             logger.info(f"⚽ TABLE FORMAT: {TABLE_FORMAT}") 
-            if drop_table == False :  
+            if drop_table == False :
                 logger.info(f"🚀 A ejecutar : \n{sql_query}") 
                 dll_querie = read_templated_file(
                     file_path=f'{sql_queries_dir}/generic/create_table/create_{TABLE_FORMAT}_table.sql', 
                     params={
-                        'table_name':table_name ,  
-                        'target_db':target_db , 
+                        'table_name':table_name ,
+                        'target_db':target_db ,
                         'sql_query': sql_query ,
-                        's3_table_location':f"{s3_etl_output_data}{table_name}/"  
+                        's3_table_location':f"{s3_etl_output_data}{table_name}/"
                     }
                 )
                 logger.info(f"🚴 API Running : \n{dll_querie}")
 
                 """
-                    OPCION 1 : Ejecuta la consulta en athena con boto
+                    OPCIÓN 1 : Ejecuta la consulta en athena con boto
                         Errores : Esporádicamente la consulta indica que la tabla ya existe, indicando que no se borro completamente la tabla en s3 , pero el log indica que si .
-                    
-                    OPCION 2 : Ejecuta la consulta en athena con Step Functions
+
+                    OPCIÓN 2 : Ejecuta la consulta en athena con Step Functions
                         Errores : el lambda etl que ejecuta el proceso pierde conexión con el worker , 
                         pues la step function se ejecuta duplicadamente, perdiendo la traza y dando un timeout
-                        
+
                     Notar que si solo se especifica el WorkGroup no es necesario indicar el OutputLocation
                 """
                 option_for_execute_query = 2
@@ -173,13 +172,13 @@ def create_table_original(table_name, target_db , sql_query  , drop_table=False 
                     assert sf.wait_step_function(execution_arn )  == True , "Error al crear la tabla"
 
                 logger.info("✔️ DDL Ejecutada con éxito" )
-            
+
             # si los casos terminaron con exito ...
             estado = 'creada' if drop_table == False else 'eliminada'
             msg = f"✔️ Tabla {target_db}.{table_name} {estado} con éxito"
             logger.info(msg)
             return True
-        
+
         else:
             raise ValueError(f'Variables no deben ser nulas o vacías {locals()}')
         # response['ctas_query_metadata']#['Status']['State']
@@ -197,12 +196,12 @@ def create_table_original(table_name, target_db , sql_query  , drop_table=False 
 def wait_create_table(QueryExecutionId):
     """ Espera a que la tabla se cree en athena """
     # iterations = 360 # 30 mins max of athena execution time
-    ITERATIONS = 0 #  
-    # WAITING_TIME_IN_SECONDS    
+    ITERATIONS = 0 #
+    # WAITING_TIME_IN_SECONDS
     WAIT_TIME = 15
     status = "RUNNING"
     while  ITERATIONS < WAITING_TIME_IN_SECONDS:
-        ITERATIONS += WAIT_TIME 
+        ITERATIONS += WAIT_TIME
         if ITERATIONS % WAIT_TIME == 0:
             logger.info(f"⏱️ {ITERATIONS} , Esperando que la consulta termine {QueryExecutionId} ... {status}" )
         time.sleep(WAIT_TIME) 
@@ -211,7 +210,7 @@ def wait_create_table(QueryExecutionId):
             QueryExecutionId = QueryExecutionId
         )
         status = response_get_query_details['QueryExecution']['Status']['State']
-        
+
         if (status == 'FAILED') or (status == 'CANCELLED') :
             failure_reason = response_get_query_details['QueryExecution']['Status']['StateChangeReason']
             logger.info(f"🔥 Error al ejecutar querie, razón: {failure_reason} {response_get_query_details}"  )
@@ -230,15 +229,15 @@ def wait_create_table(QueryExecutionId):
 
 def delete_table(target_db , table_name):
     """ Elimina una tabla de athena (wrapper de glue ) """
-    try : 
+    try :
         logger.info("Deleting table from glue catalog")
-        if delete_a_table_from_database( target_db , table_name ) : 
+        if delete_a_table_from_database( target_db , table_name ) :
             logger.info(f"✔️ Tabla eliminada  '{target_db}.{table_name}'")
-            return True 
+            return True
         else:
             raise Exception(f"Error al eliminar la tabla '{target_db}.{table_name}'")
     except Exception as e:
-        # e = traceback.format_exc() 
+        # e = traceback.format_exc()
         logger.info( f"Error al eliminar la tabla '{target_db}.{table_name}' Error : {str(e)}"  )
         return False
 
@@ -256,7 +255,7 @@ def delete_s3_data(table_name):
         custom_s3_output=f'{s3_prefix_etl_output_data}{table_name}/'
         logger.info(f"Deleting table from s3 bucket :{custom_s3_output}"  )
         s3_response = s3_client.list_objects_v2(Bucket= S3_BUCKET_DATALAKE, Prefix = custom_s3_output )
-        
+
         if 'Contents' in s3_response:
             if len(s3_response["Contents"]) > 0 :
                 logger.info(f"Quedan {len(s3_response['Contents'])} archivos por eliminar .... "  ) 
@@ -267,17 +266,13 @@ def delete_s3_data(table_name):
         # custom_s3_output=f'{s3_prefix_etl_output_data}metadata/{table_name}/tables'
         # logger.info(f"Deleting table from s3 bucket :{custom_s3_output}"  )
         # s3_response = s3_client.list_objects_v2(Bucket= S3_BUCKET_DATALAKE, Prefix = custom_s3_output )
-        
+
         # if 'Contents' in s3_response:
         #     if len(s3_response["Contents"]) > 0 :
         #         logger.info(f"Quedan {len(s3_response['Contents'])} archivos por eliminar .... "  ) 
         #         for object in s3_response['Contents']:
         #             print('Deleting', object['Key'])
         #             s3_client.delete_object(Bucket=S3_BUCKET_DATALAKE, Key=object['Key'])
- 
- 
- 
- 
         #     assert   len(s3_response["Contents"]) == 0 , "Error al eliminar los datos de la tabla"
         assert   wait_for_delete_files(table_name, metadata=False) == True , "❌Error esperando eliminar los datos de la tabla"
         # assert   wait_for_delete_files(table_name, metadata=True) == True , "❌Error esperando eliminar los metadatos de la tabla"
@@ -292,38 +287,36 @@ def delete_s3_data(table_name):
 
 
 def wait_for_delete_files(table_name, metadata=False):
-    
-    
-    ITERATIONS = 0 
+
+    ITERATIONS = 0
     WAIT_TIME = 3
     # status = "Waiting"
-    
-    if metadata : 
+    if metadata :
         custom_s3_output=f'{s3_prefix_etl_output_data}metadata/{table_name}/tables'
     else:
         custom_s3_output=f'{s3_prefix_etl_output_data}{table_name}/'
-        
+
     while  ITERATIONS < WAITING_TIME_IN_SECONDS:
-        ITERATIONS += WAIT_TIME 
+        ITERATIONS += WAIT_TIME
         if ITERATIONS % WAIT_TIME == 0:
             print(f"⏱️ {ITERATIONS} , Esperando eliminar de  {custom_s3_output}  ")
-            
-        time.sleep(WAIT_TIME) 
-    
+
+        time.sleep(WAIT_TIME)
+
         s3_response = s3_client.list_objects_v2(Bucket= S3_BUCKET_DATALAKE, Prefix = custom_s3_output )
-        
+
         if 'Contents' in s3_response:
             if len(s3_response["Contents"]) > 0 :
                 logger.info(f"Quedan {len(s3_response['Contents'])} archivos por eliminar ....{s3_response['Contents']}"  )
                 for object in s3_response['Contents']:
                     print('Deleting', object['Key'])
                     s3_client.delete_object(Bucket=S3_BUCKET_DATALAKE, Key=object['Key'])
-                
+
                 continue
-            
-            elif len(s3_response["Contents"]) == 0  :    
+
+            elif len(s3_response["Contents"]) == 0  :
                 return True
-            
+
         elif 'Contents' not in s3_response :
             logger.info(f"✔️Sin datos en el bucket  : {custom_s3_output}"  )
             return True 

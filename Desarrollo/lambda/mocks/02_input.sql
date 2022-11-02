@@ -3,7 +3,7 @@
     {
       "environment": "PROD",
       "report_name": "ficcus",
-      "schema": "cl",
+      "schema": "mx",
       "report_to": [
         "cvargas@georesearch.cl"
       ],
@@ -17,7 +17,7 @@
       "canasta_categoria_id": [
         34
       ],
-      "substring_id_o_subcadena": [
+      "substring_id": [
         4,
         5,
         6
@@ -26,8 +26,7 @@
         10008
       ],
       "etl_list": [
-        "local",
-        "delivery"
+        "local" 
       ]
     }
   ]

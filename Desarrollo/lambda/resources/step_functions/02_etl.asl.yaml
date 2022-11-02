@@ -27,6 +27,7 @@ States:
       Payload:
         stage: 1
 
+        input.$: $
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name
@@ -66,6 +67,7 @@ States:
     Parameters:
       Payload:
         stage: 2
+        input.$: $
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name
@@ -104,6 +106,7 @@ States:
     Parameters:
       Payload:
         stage: 1
+        input.$: $
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name
@@ -142,6 +145,7 @@ States:
     Parameters:
       Payload:
         stage: 2
+        input.$: $
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name
@@ -167,6 +171,8 @@ States:
     Parameters:
       Payload:
         stage: 1
+
+        input.$: $
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name
@@ -206,6 +212,7 @@ States:
       Payload:
         stage: 2
         
+        input.$: $
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name
@@ -267,6 +274,7 @@ States:
       Payload:
         stage: 3
         
+        input.$: $
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name
@@ -306,6 +314,7 @@ States:
     Parameters:
       Payload:
         stage: 1
+        input.$: $
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name
@@ -346,6 +355,7 @@ States:
     Parameters:
       Payload:
         stage: 2
+        input.$: $
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         report_name.$: $.report_name

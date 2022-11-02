@@ -50,18 +50,17 @@ lambda_client = boto3.client("lambda")
 """
 def handler( event, context):
     print(f"event --->: {event}")
-    etl_name = event.get('etl_name', None)
-    report_name = event.get('report_name', None)
-    schema = event.get('schema', None)
-    buffer_search = event.get('buffer_search', None)
-    parametros = event #.get('parametros', None) #TODO VALIDAR ESTE CAMPO
-    # drop_table,drop_workflow = event.get('drop_workflow', False)
+    stage = event.get('stage', None)
+    schema        = event.get('input', None).get('schema', None)
+    buffer_search = event.get('input', None).get('buffer_search', None)
+    etl_name      = event.get('input', None).get('etl_name', None)
+    report_name   = event.get('input', None).get('report_name', None)
     response = {}
 
     try:
 
       # valida que las variables no sean nulas o vacías
-      if not [x for x in (schema,report_name ,etl_name , buffer_search ) if x  == '' or x is None] :
+      if not [x for x in (schema,report_name ,etl_name , buffer_search , stage ) if x  == '' or x is None] :
 
         # if etl_name == "demografico":
         #     response = etl_demografico(event)
@@ -83,7 +82,7 @@ def handler( event, context):
 
         return {"status": "OK","response": response}
       else:
-          raise ValueError(f"Error (schema,report_name ,etl_name , buffer_search ), No deben ser vacíos: {event}")
+          raise ValueError(f"Error (schema,report_name ,etl_name , buffer_search , stage ), No deben ser vacíos: {event}")
 
     except Exception as e:
         # tb = traceback.format_exc()

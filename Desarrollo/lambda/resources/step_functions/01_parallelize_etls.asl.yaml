@@ -39,12 +39,13 @@ States:
                     schema.$: $.schema
                     report_to.$: $.report_to
                     drop_workflow.$: $.drop_workflow
-                    buffer_search_search.$: $.buffer_search_search
+                    buffer_search.$: $.buffer_search
                     surface_factor.$: $.surface_factor
                     distance_factor.$: $.distance_factor
                     start_point.$: $.start_point
                     cannibalization_shape.$: $.cannibalization_shape
                     substring_id.$: $.substring_id
+                    canasta_categoria_id.$: $.canasta_categoria_id
                     pois_category_id.$: $.pois_category_id
                   ResultSelector:
                     etl_res.$: $[1][*]
@@ -62,12 +63,13 @@ States:
               schema.$: $$.Map.Item.Value.schema
               report_to.$: $$.Map.Item.Value.report_to
               drop_workflow.$: $$.Map.Item.Value.drop_workflow
-              buffer_search_search.$: $$.Map.Item.Value.buffer_search_search
+              buffer_search.$: $$.Map.Item.Value.buffer_search
               surface_factor.$: $$.Map.Item.Value.surface_factor
               distance_factor.$: $$.Map.Item.Value.distance_factor
               start_point.$: $$.Map.Item.Value.start_point
               cannibalization_shape.$: $$.Map.Item.Value.cannibalization_shape
               substring_id.$: $$.Map.Item.Value.substring_id
+              canasta_categoria_id.$: $$.Map.Item.Value.canasta_categoria_id
               pois_category_id.$: $$.Map.Item.Value.pois_category_id
             ResultSelector:
               customer_res.$: $[1][*]
@@ -75,88 +77,6 @@ States:
             ResultPath: $.etls_results
             Next: Pass
           Pass:
-            Type: Pass
-            End: true
-      - StartAt: customers map 2 solo de respaldo para un worflow secundario
-        States:
-          customers map 2 solo de respaldo para un worflow secundario:
-            Type: Map
-            Iterator:
-              StartAt: country map 2
-              States:
-                country map 2:
-                  Type: Map
-                  Next: Pass (1) 2
-                  Iterator:
-                    StartAt: buffer_search map 2
-                    States:
-                      buffer_search map 2:
-                        Type: Map
-                        Next: Pass (2) 2
-                        Iterator:
-                          StartAt: workflow_consolidar
-                          States:
-                            workflow_consolidar:
-                              Type: Task
-                              Resource: arn:aws:states:::states:startExecution.sync:2
-                              Parameters:
-                                StateMachineArn: >-
-                                  arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}cconsolidar
-                                Input.$: $
-                              End: true
-                              ResultSelector:
-                                PASS: OK
-                              OutputPath: $.PASS
-                        ItemsPath: $.buffer_search_list
-                        Parameters:
-                          report_name.$: $.report_name
-                          schema.$: $.schema
-                          buffer_search.$: $$.Map.Item.Value
-                          drop_workflow.$: $.drop_workflow
-                          etl_name: consolidar
-                          
-                        ResultSelector:
-                          buffer_search_res.$: $[*]
-                        OutputPath: $.buffer_search_res
-                        MaxConcurrency: 40
-                        Comment: >-
-                          En este paso se agrega al inputs, el nombre etl =
-                          consolidar , para continuar con la ultima parte 
-                      Pass (2) 2:
-                        Type: Pass
-                        End: true
-                  ItemsPath: $.country_list
-                  Parameters:
-                    report_name.$: $.report_name
-                    schema.$: $$.Map.Item.Value
-                    buffer_search_list.$: $.buffer_search_list
-                    drop_workflow.$: $.drop_workflow
-                    
-                  ResultSelector:
-                    country_res.$: $[*]
-                  OutputPath: $.country_res
-                  MaxConcurrency: 40
-                Pass (1) 2:
-                  Type: Pass
-                  End: true
-            Catch:
-              - ErrorEquals:
-                  - States.ALL
-                ResultPath: $.consolidacion_error
-                Next: Pass (1)
-            ItemsPath: $.customer_list
-            Parameters:
-              report_name.$: $$.Map.Item.Value.report_name
-              country_list.$: $$.Map.Item.Value.country_list
-              buffer_search_list.$: $$.Map.Item.Value.buffer_search_list
-              drop_workflow.$: $$.Map.Item.Value.drop_workflow
-              parametros.$: $$.Map.Item.Value.parametros
-            ResultSelector:
-              customer_res.$: $[*]
-            OutputPath: $.customer_res
-            MaxConcurrency: 40
-            Next: Pass (1)
-          Pass (1):
             Type: Pass
             End: true
     Catch:
