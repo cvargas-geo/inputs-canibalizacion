@@ -8,8 +8,8 @@ States:
         StringMatches: demografico
         Next: D ETAPA 1
       - Variable: $.etl_name
-        StringMatches: gastos
-        Next: G ETAPA 1
+        StringMatches: local
+        Next: LOCAL ETAPA 1
       - Variable: $.etl_name
         StringMatches: competencias
         Next: C ETAPA 1
@@ -17,7 +17,7 @@ States:
         StringMatches: locales_propios
         Next: LP ETAPA 1
     Comment: >-
-      {       "country_name": "pe",  
+      {       "schema": "pe",  
       "drop_workflow": false,   "customer_name": "dummy_customer",   "buffer":
       4000,   "etl_name": "gastos" }
   C ETAPA 1:
@@ -27,7 +27,7 @@ States:
       Payload:
         stage: 1
         
-        country_name.$: $.country_name
+        schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         customer_name.$: $.customer_name
         buffer.$: $.buffer
@@ -52,7 +52,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_inputs_estudios_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa1.response.worker_tasks_list
     Next: C ETAPA 2
@@ -67,7 +67,7 @@ States:
       Payload:
         stage: 2
         
-        country_name.$: $.country_name
+        schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         customer_name.$: $.customer_name
         buffer.$: $.buffer
@@ -92,7 +92,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_inputs_estudios_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa2.response.worker_tasks_list
     ResultSelector:
@@ -100,14 +100,14 @@ States:
       etapa: 2
     ResultPath: $.result_etapa2
     Next: OK
-  G ETAPA 1:
+  LOCAL ETAPA 1:
     Type: Task
     Resource: arn:aws:states:::lambda:invoke
     Parameters:
       Payload:
         stage: 1
         
-        country_name.$: $.country_name
+        schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         customer_name.$: $.customer_name
         buffer.$: $.buffer
@@ -132,22 +132,22 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_inputs_estudios_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa1.response.worker_tasks_list
-    Next: G ETAPA 2
+    Next: LOCAL ETAPA 2
     ResultSelector:
       result.$: $.Output
       etapa: 1
     ResultPath: $.result_etapa1
-  G ETAPA 2:
+  LOCAL ETAPA 2:
     Type: Task
     Resource: arn:aws:states:::lambda:invoke
     Parameters:
       Payload:
         stage: 2
         
-        country_name.$: $.country_name
+        schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         customer_name.$: $.customer_name
         buffer.$: $.buffer
@@ -174,7 +174,7 @@ States:
       Payload:
         stage: 1
         
-        country_name.$: $.country_name
+        schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         customer_name.$: $.customer_name
         buffer.$: $.buffer
@@ -199,7 +199,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_inputs_estudios_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa1.response.worker_tasks_list
     Next: D ETAPA 2
@@ -214,7 +214,7 @@ States:
       Payload:
         stage: 2
         
-        country_name.$: $.country_name
+        schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         customer_name.$: $.customer_name
         buffer.$: $.buffer
@@ -239,7 +239,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_inputs_estudios_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa2.response.worker_tasks_list
     ResultSelector:
@@ -260,7 +260,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_inputs_estudios_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa2.response.worker_tasks_list
     ResultSelector:
@@ -275,7 +275,7 @@ States:
       Payload:
         stage: 3
         
-        country_name.$: $.country_name
+        schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         customer_name.$: $.customer_name
         buffer.$: $.buffer
@@ -300,7 +300,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_inputs_estudios_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa3.response.worker_tasks_list
     ResultSelector:
@@ -314,7 +314,7 @@ States:
     Parameters:
       Payload:
         stage: 1
-        country_name.$: $.country_name
+        schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         customer_name.$: $.customer_name
         etl_name.$: $.etl_name
@@ -340,7 +340,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_inputs_estudios_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa1.response.worker_tasks_list
     ResultSelector:
@@ -354,7 +354,7 @@ States:
     Parameters:
       Payload:
         stage: 2
-        country_name.$: $.country_name
+        schema.$: $.schema
         drop_workflow.$: $.drop_workflow
         customer_name.$: $.customer_name
         etl_name.$: $.etl_name

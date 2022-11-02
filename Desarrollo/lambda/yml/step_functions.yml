@@ -1,0 +1,51 @@
+# Para importarlas solo exportar la sf desde la consola web como yaml y hacer los reemplazos de los stage _dev_ por _${self:custom.stage}_
+#  o  -dev- por -${self:custom.stage}-
+# Nomenclatura de nombres:  WORKFLOW_<STAGE>_${self:service}_<SF_NAME>
+# IMPORTANTE CUIDADO DE PISAR LAS LLAMADA A OTRAS SF , EL STAGE SE SETEA CON : workflow_${self:custom.stage}_
+# ej :arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_locales_propios
+# Ojo que en el etl 05_consolidar tbn lambda  : arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
+stateMachines:
+  sf_1:
+    name: workflow_${self:custom.stage}_${self:service}_parallelize_etls
+    # TODO CREATE NEW ROLE FOR CANNI
+    role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
+    definition:
+      ${file(./resources/step_functions/01_parallelize_etls.asl.yaml)}
+    tracingConfig:
+      enabled: true
+  sf_2:
+    name: workflow_${self:custom.stage}_${self:service}_etl
+    role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
+    definition:
+      ${file(./resources/step_functions/02_etl.asl.yaml)}
+    tracingConfig:
+      enabled: true
+#     sf_3:
+#       name: workflow_${self:custom.stage}_${self:service}_parallelize_locales_propios
+#       role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
+#       definition:
+#         ${file(./resources/step_functions/03_parallelize_locales_propios.asl.yaml)}
+#       tracingConfig:
+#         enabled: true
+#     sf_4:
+#       name: workflow_${self:custom.stage}_${self:service}_parallelize_workers
+#       role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
+#       definition:
+#         ${file(./resources/step_functions/04_parallelize_workers.asl.yaml)}
+#       tracingConfig:
+#         enabled: true
+#     sf_5:
+#       name: workflow_${self:custom.stage}_${self:service}_consolidar
+#       role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
+#       definition:
+#         ${file(./resources/step_functions/05_consolidar.asl.yaml)}
+#       tracingConfig:
+#         enabled: true
+
+#     sf_dms_1:
+#       name: workflow_${self:custom.stage}_dms_replicacion
+#       role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
+#       definition:
+#         ${file(./resources/step_functions/01_dms_replication.asl.yaml)}
+#       tracingConfig:
+#         enabled: true

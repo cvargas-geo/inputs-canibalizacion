@@ -1,5 +1,6 @@
-service: cannibalization-report
+service: cannibalization
 frameworkVersion: ">=3.12.0"
+configValidationMode: error
 
 provider:
   name: aws
@@ -12,12 +13,12 @@ provider:
     stage: ${opt:stage,'dev'}
     STAGE: ${sls:stage}
     aws_region: us-east-1
-    SERVICE_NAME: "cannibalization-report"
+    SERVICE_NAME: ${self:service}
     PG_TARGET_SCHEMA: "aws_migrations"
     S3_BUCKET_DATALAKE: "georesearch-datalake"
     CREATE_ATHENA_TABLE_LAMBDA_NAME: "worker-athena-create-table"
     SOURCE_DB: "prod_countries"
-    TARGET_DB: "prod_inputs_estudios"
+    TARGET_DB: ${self:service}
     DATALAKE_DB: "prod_countries"
     DATALAKE_CRAWLER: "dms_${sls:stage}_georesearch_datalake"
     DELIVERY_PREFIX: "georesearch_deliveries"
@@ -70,7 +71,7 @@ provider:
             - "xray:PutTraceSegments"
             - "xray:PutTelemetryRecords"
   apiGateway:
-    description: AG para inputs estudios # optional - description of deployment history
+    description: AG for ${self:service} # optional - description of deployment history
 
     # tracing:
     #   lambda: true
@@ -83,6 +84,7 @@ package:
       - '!node_modules/**' 
       - '!.requirements/**'
       - '!env/**'
+      - '!yml/**'
       - '!README.md'
       - '!package.json'
       - '!package-lock.json'
@@ -93,7 +95,7 @@ package:
     # - "!*.md"
     # - "psycopg2/**"
     # - "sql_queries/athena/**.sql"
-    # # - "src/**" 
+    # # - "src/**"
     # - "serverless.yml"
     # - "requirements.txt"
     # - "Dockerfile"
@@ -102,182 +104,35 @@ plugins:
   - serverless-python-requirements
   - serverless-prune-plugin
   - serverless-step-functions
-custom:
-  stage: ${opt:stage, self:provider.stage}
-  settings:
-    dev:
-      STAGE: ${self:custom.stage}
-    prod:
-      STAGE: ${self:custom.stage}
-  pythonRequirements:
-    # layer: true
-  #   #dockerImage:
-  #   fileName: requirements.txt
-    # dockerizePip: true
-    dockerizePip: non-linux
-    layer: true
-    zip: true
-    # slim: false #false for jinja an add test files 
-    # strip: false # avoid some ELF alignment issues
-    slimPatternsAppendDefaults: false
-    slimPatterns:
-    - '**/*.py[c|o]'
-    - '**/*.egg-info*'
-    - '**/__pycache__*'
-    - '**/*.dist-info*'
-    - '**/dist-info*' 
-    # - '**/test*'
-    # - '**/*.test*'  
-    # layer:
-    #   # path:
-    #   #   - /layer
-    #   layer: true
-    #   name: pip-layer
-    #   description: Python requirements lambda layer
-    #   compatibleRuntimes:
-    #     - python3.6
-    #   allowedAccounts:
-    #     - "*"
-    useDownloadCache: true
-    useStaticCache: true
-    # cacheLocation: "./cache"
-    # # pipCmdExtraArgs:
-    # #   - --no-deps
-    zipImport: true
-  prune: #serverless-prune-plugin configuration: 3 versions are kept
-    automatic: true
-    number: 2
+  # - serverless-athena
 
-# stepFunctions:
-#   # Para importarlas solo exportar la sf desde la consola web como yaml y hacer los reemplasos de los stage _dev_ por _${self:custom.stage}_
-#   #  o  -dev- por -${self:custom.stage}-
-#   # Nomenclatura de nombres:  WORKFLOW_<STAGE>_${self:service}_<SF_NAME>
-#   # IMPORTANTE CUIDADO DE PISAR LAS LLAMADA A OTRAS SF , EL STAGE SE SETEA CON : workflow_${self:custom.stage}_
-#   # ej :arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_locales_propios
-#   # Ojo que en el etl 05_consolidar tbn lambda  : arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
-#   stateMachines:
-#     sf_1:
-#       name: workflow_${self:custom.stage}_${self:service}_parallelize_etls
-#       role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
-#       definition:
-#         ${file(./resources/step_functions/01_parallelize_etls.asl.yaml)}
-#       tracingConfig:
-#         enabled: true
-#     sf_2:
-#       name: workflow_${self:custom.stage}_${self:service}_etl
-#       role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
-#       definition:
-#         ${file(./resources/step_functions/02_etl.asl.yaml)}
-#       tracingConfig:
-#         enabled: true
-#     sf_3:
-#       name: workflow_${self:custom.stage}_${self:service}_parallelize_locales_propios
-#       role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
-#       definition:
-#         ${file(./resources/step_functions/03_parallelize_locales_propios.asl.yaml)}
-#       tracingConfig:
-#         enabled: true
-#     sf_4:
-#       name: workflow_${self:custom.stage}_${self:service}_parallelize_workers
-#       role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
-#       definition:
-#         ${file(./resources/step_functions/04_parallelize_workers.asl.yaml)}
-#       tracingConfig:
-#         enabled: true
-#     sf_5:
-#       name: workflow_${self:custom.stage}_${self:service}_consolidar
-#       role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
-#       definition:
-#         ${file(./resources/step_functions/05_consolidar.asl.yaml)}
-#       tracingConfig:
-#         enabled: true
-    
-#     sf_dms_1:
-#       name: workflow_${self:custom.stage}_dms_replicacion
-#       role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
-#       definition:
-#         ${file(./resources/step_functions/01_dms_replication.asl.yaml)}
-#       tracingConfig:
-#         enabled: true
+custom: ${file(yml/custom.yml)}
+resources: ${file(yml/glue_db.yml)}
+stepFunctions: ${file(yml/step_functions.yml)}
+functions: ${file(yml/functions.yml)}
 
 
-
-
-functions:
-
-  master-report:
-    # name: ${self:service}-modelv2-${self:custom.stage}
-    description:   ${self:service}  Servicio de creación de reportes de canibalización  [${self:custom.stage}]
-    memorySize: 256
-    handler: api_report.report
-    # Maximum retry attempts when an asynchronous invocation fails (between 0 and 2; default: 2)
-    maximumRetryAttempts: 0
-    layers:
-      - {Ref: PythonRequirementsLambdaLayer}
-      # - arn:aws:lambda:us-east-1:233683678126:layer:xgboost:3
-      # -  arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py38:2
-      # - arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py37:3
-      # - arn:aws:lambda:us-east-1:336392948345:layer:AWSDataWrangler-Python37:5
-    package:
-      # individually: true
-      #  Si desea excluir archivos, puede usar un patrón global con el prefijo ! (https://www.serverless.com/framework/docs/providers/aws/guide/packaging/#patterns)
-      patterns: 
-        # - "!./**/*"
-        - "!*.md"
-        - "utils/**/**/**/*.py"
-        - "etls/**/**/**/*.py"
-        # - "sql_queries/**/**/**/*.sql"
-        - "*.py"
-        - "*.zip"
-        - ".requirements.zip"
-        - "serverless.yml"
-        - "requirements.txt"
-        - "Dockerfile"
-
-    events:
-      - http:
-          path: /report
-          method: POST
-          integration: lambda
-          cors: true
-          private: true
-          response:
-            headers:
-              Content-Type: "'application/json'"
-
-  worker-athena-create-table:
-    # name: ${self:service}-modelv2-${self:custom.stage}
-    description:   ${self:service} Crea una tabla en Athena [${self:custom.stage}]
-    memorySize: 500
-    handler: api_report.worker_athena_create_table
-    # Maximum retry attempts when an asynchronous invocation fails (between 0 and 2; default: 2)
-    maximumRetryAttempts: 0
-    layers:
-      # - {Ref: PythonRequirementsLambdaLayer}
-      # - arn:aws:lambda:us-east-1:233683678126:layer:xgboost:3
-      # -  arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py38:2
-      # - arn:aws:lambda:us-east-1:898466741470:layer:psycopg2-py37:3
-      - arn:aws:lambda:us-east-1:336392948345:layer:AWSDataWrangler-Python37:5
-    package:
-      # individually: true
-      #  Si desea excluir archivos, puede usar un patrón global con el prefijo ! (https://www.serverless.com/framework/docs/providers/aws/guide/packaging/#patterns)
-      patterns: 
-        # - "!./**/*"
-        - "!*.md"
-        - "sql_queries/**/**/**/*.sql"
-        - "utils/**/**/**/*.py"
-        - "etls/**/**/**/*.py"
-        # - "./**/**.py"
-        # - "./**/**.zip"
-        - "*.py"
-        - "*.zip"
-        - ".requirements.zip"
-        - "serverless.yml"
-        - "requirements.txt"
-        - "Dockerfile"
-
-    # events:
-    #   - http:
-    #       path: /
-    #       method: get
-    #       cors: true
+# this not work - serverless-athena
+  # athena:
+    # catalog: AwsDataCatalog #optional (default: AwsDataCatalog)
+    # databases: # list of your dbs
+    #   - name: qa_cannibalization # required, your database name, do not use an existing database, will be dropped in deployement process
+    #     catalog: AwsDataCatalog #optional (default: AwsDataCatalog)
+    #     output: s3://aws-athena-query-results-958531303673-us-east-1/ # required, your results bucket
+    #     description: Default db for ${self:service} api project  # optional, table comment
+    #     properties: # optional, db properties
+    #       - author: serverless
+    #     tables: # list of your tables
+    #       - name: qa_table # required, table name
+    #         ddl: $(file(resources/athena/qa_table.sql)} # required, DDL containing the CREATE TABLE
+    #         keepPartitions: true # force backup and restore partitions
+      # - name: prod_cannibalization # required, your database name, do not use an existing database, will be dropped in deployement process
+      #   catalog: AwsDataCatalog #optional (default: AwsDataCatalog)
+      #   output: s3://aws-athena-query-results-958531303673-us-east-1/ # required, your results bucket
+      #   description: Default db for ${self:service} api project  # optional, table comment
+      #   properties: # optional, db properties
+      #     - author: serverless
+      #   tables: # list of your tables
+      #     - name: prod_table # required, table name
+      #       ddl: $(file(resources/athena/prod_table.sql)} # required, DDL containing the CREATE TABLE
+      #       keepPartitions: true # force backup and restore partitions

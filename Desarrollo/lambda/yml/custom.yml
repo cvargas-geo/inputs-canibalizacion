@@ -1,0 +1,44 @@
+stage: ${opt:stage, self:provider.stage}
+settings:
+  dev:
+    STAGE: ${self:custom.stage}
+  prod:
+    STAGE: ${self:custom.stage}
+pythonRequirements:
+  # layer: true
+#   #dockerImage:
+#   fileName: requirements.txt
+  # dockerizePip: true
+  dockerizePip: non-linux
+  layer: true
+  zip: true
+  # slim: false #false for jinja an add test files 
+  # strip: false # avoid some ELF alignment issues
+  slimPatternsAppendDefaults: false
+  slimPatterns:
+  - '**/*.py[c|o]'
+  - '**/*.egg-info*'
+  - '**/__pycache__*'
+  - '**/*.dist-info*'
+  - '**/dist-info*' 
+  # - '**/test*'
+  # - '**/*.test*'  
+  # layer:
+  #   # path:
+  #   #   - /layer
+  #   layer: true
+  #   name: pip-layer
+  #   description: Python requirements lambda layer
+  #   compatibleRuntimes:
+  #     - python3.6
+  #   allowedAccounts:
+  #     - "*"
+  useDownloadCache: true
+  useStaticCache: true
+  # cacheLocation: "./cache"
+  # # pipCmdExtraArgs:
+  # #   - --no-deps
+  zipImport: true
+prune: #serverless-prune-plugin configuration: 3 versions are kept
+  automatic: true
+  number: 2

@@ -1,0 +1,15 @@
+{
+    "etl_name.$": "$$.Map.Item.Value",
+    "environment.$": "$.environment",
+    "report_name.$": "$.report_name",
+    "schema.$": "$.schema",
+    "report_to.$": "$.report_to",
+    "drop_workflow.$": "$.drop_workflow",
+    "buffer_search.$": "$.buffer_search",
+    "surface_factor.$": "$.surface_factor",
+    "distance_factor.$": "$.distance_factor",
+    "start_point.$": "$.start_point",
+    "cannibalization_shape.$": "$.cannibalization_shape",
+    "substring_id.$": "$.substring_id",
+    "pois_category_id.$": "$.pois_category_id"
+}

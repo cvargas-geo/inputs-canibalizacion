@@ -7,8 +7,8 @@ def read_file(file_path) :
     return open(file_path ,"r").read()
 
 
-def read_templated_file(file_path  , params = {} ) :
-    """ Dada una ruta de archivo de texto y un diccionario de parametros, 
+def read_templated_file(file_path  , obj ) :
+    """ Dada una ruta de archivo de texto y un objeto,
     retorna una consulta con los parámetros reemplazados
      doc util:
      https://jinja.palletsprojects.com/en/2.10.x/templates/#assignments
@@ -18,7 +18,7 @@ def read_templated_file(file_path  , params = {} ) :
     file = read_file(file_path)
     # print(file)
     #, undefined=StrictUndefined avisa si una variable no esta definida
-    templed_sql = Template(file , undefined=StrictUndefined).render(params=params)
+    templed_sql = Template(file , undefined=StrictUndefined).render(obj)
     # print(templed_sql)
     return templed_sql.replace("\n", " ").replace("\t", " ")
 

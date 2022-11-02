@@ -19,7 +19,7 @@ sf_client = boto3.client('stepfunctions')
 def report(event, context):
     return {"status": "de panita","executionArn": "fake:arn:12345678"}
 
-def master_report_wip(event, context):
+def report(event, context):
     """En este caso cada request corresponde a una solicitud ,
         pero se podría transformar en una lista de solicitudes para procesos masivos
     """    # start_time = time.time()
@@ -53,8 +53,8 @@ def master_report_wip(event, context):
                     raise ValueError(f"❌ start_point no ha sido especificado")
                 if 'cannibalization_shape' not in  solicitud:
                     raise ValueError(f"❌ cannibalization_shape no ha sido especificado")
-                if 'substring_id_o_subcadena' not in  solicitud:
-                    raise ValueError(f"❌ substring_id_o_subcadena no ha sido especificado")
+                if 'substring_id' not in  solicitud:
+                    raise ValueError(f"❌ substring_id no ha sido especificado")
                 if 'pois_category_id' not in  solicitud:
                     raise ValueError(f"❌ pois_category_id no ha sido especificado")
                 if 'etl_list' not in  solicitud:
@@ -75,19 +75,21 @@ def master_report_wip(event, context):
 
 
             input_data = {"reports_request":reports_request}
+            status = 'TEST'
+            execution_arn = 'fake:arn:12345678'
+            if True :
+                ## llamada a etls en paralelo
+                """ Nota : Esta step function si bien se ejecuta correctamente excede podría tardar hasta 30 min por lo que,
+                se debe implementar un sistema para monitorear el estado de la ejecución por medio de eventos """
+                response = sf.iniciar_step_function(SF_01_NAME_PARALLELIZE_ETLS ,input_data )
+                execution_arn = response['executionArn']
 
-            ## llamada a etls en paralelo
-            """ Nota : Esta step function si bien se ejecuta correctamente excede podría tardar hasta 30 min por lo que,
-            se debe implementar un sistema para monitorear el estado de la ejecución por medio de eventos """
-            response = sf.iniciar_step_function(SF_01_NAME_PARALLELIZE_ETLS ,input_data )
-            execution_arn = response['executionArn']
-
-            # Se agrega algo de log para la salida de la ejecución
-            sf_response = sf.sfn_client.describe_execution(executionArn=execution_arn)
-            status = sf_response['status']
-            if status == 'FAILED':
-                sf_error = sf_response['QueryExecution']['Status']['StateChangeReason']
-                raise Exception(sf_error)
+                # Se agrega algo de log para la salida de la ejecución
+                sf_response = sf.sfn_client.describe_execution(executionArn=execution_arn)
+                status = sf_response['status']
+                if status == 'FAILED':
+                    sf_error = sf_response['QueryExecution']['Status']['StateChangeReason']
+                    raise Exception(sf_error)
 
             return {"status": status,"executionArn": execution_arn}
 
@@ -104,13 +106,11 @@ def worker_athena_create_table(event, context):
     """Esta lambda concurrente sera invocada desde todos los reportes para crear una tabla en athena
     Recordar usar nombres en snake_case sin espacios Ej: mi_tabla_b300
     Y no no deben comenzar con números
-    """  
+    """
     table_name = event.get('table_name', None)
     sql_query = event.get('sql_query', None) 
     drop_table = event.get('drop_table', False) 
 
-  
-    
     #TODO GET FOM ENVIRONMENT VARIABLES
     # SOURCE_DB = 'prod_countries' 
     # TARGET_DB = 'qa_inputs_estudios' 
@@ -143,10 +143,7 @@ def worker_athena_create_table(event, context):
 
     except Exception as e:
         return {"status": "FAIL","error": str(e)}
-    
-    
-    
-    
+
 def get_download_links(event, context):
     # start_time = time.time()
     # event = json.loads(event['body'])

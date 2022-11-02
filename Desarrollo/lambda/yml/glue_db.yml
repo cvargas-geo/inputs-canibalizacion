@@ -1,0 +1,31 @@
+  Resources:
+    # Only for first time
+    # GlueDatabase1:
+    #   Type: AWS::Glue::Database
+    #   Properties:
+    #     # UpdateReplacePolicy: Retain
+    #     CatalogId: '958531303673'
+    #     DatabaseInput:
+    #       Name: qa_cannibalization
+    # GlueDatabase2:
+    #   Type: AWS::Glue::Database
+    #   Properties:
+    #     # UpdateReplacePolicy: Retain
+    #     CatalogId: '958531303673'
+    #     DatabaseInput:
+    #       Name: prod_cannibalizations
+
+    # example
+    # TableGlueCrawler:
+    #   Type: AWS::Glue::Crawler
+    #   Properties:
+    #     DatabaseName: ${env:DB_NAME}
+    #     Name: ${env:CRAWLER_NAME}
+    #     RecrawlPolicy:
+    #       RecrawlBehavior: CRAWL_EVERYTHING
+    #     Role: ${env:GLUE_ROLE_ARN}
+    #     SchemaChangePolicy:
+    #       DeleteBehavior: DEPRECATE_IN_DATABASE
+    #     Targets:
+    #       S3Targets:
+    #         - Path: ${env:CRAWLER_TARGET_PATH}

@@ -1,0 +1,15 @@
+{
+    "etl_list.$": "$$.Map.Item.Value.etl_list",
+    "environment.$": "$$.Map.Item.Value.environment",
+    "report_name.$": "$$.Map.Item.Value.report_name",
+    "schema.$": "$$.Map.Item.Value.schema",
+    "report_to.$": "$$.Map.Item.Value.report_to",
+    "drop_workflow.$": "$$.Map.Item.Value.drop_workflow",
+    "buffer_search.$": "$$.Map.Item.Value.buffer_search",
+    "surface_factor.$": "$$.Map.Item.Value.surface_factor",
+    "distance_factor.$": "$$.Map.Item.Value.distance_factor",
+    "start_point.$": "$$.Map.Item.Value.start_point",
+    "cannibalization_shape.$": "$$.Map.Item.Value.cannibalization_shape",
+    "substring_id.$": "$$.Map.Item.Value.substring_id",
+    "pois_category_id.$": "$$.Map.Item.Value.pois_category_id"
+}

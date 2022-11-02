@@ -79,7 +79,7 @@ WITH
 		ON 
             /*B.buffer_{{params.BUFFER}} like 'POLYGON((%))' SOLO PARA ATHENA,*/
 	    VB.shape_wkt like '%POLYGON((%))' /*SOLO PARA ATHENA,  OJO CON VIEW_BLOKCS ALGUNOS POLIGONOS MAL FORMADOS  */
-	    AND  ST_intersects(  
+	    AND  ST_intersects(
 	        ST_GeometryFromText(B.buffer_{{params.BUFFER}})   ,
 	        ST_Centroid( ST_GeometryFromText(VB.shape_wkt))
 	     )
