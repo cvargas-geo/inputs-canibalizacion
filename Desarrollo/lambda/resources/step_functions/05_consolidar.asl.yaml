@@ -8,8 +8,8 @@ States:
         StringMatches: consolidar
         Next: C ETAPA 1
     Comment: >-
-      {   "country_name": "pe",  
-      "drop_workflow": false,   "customer_name": "dummy_customer",   "buffer":
+      {   "schema": "pe",  
+      "drop_workflow": false,   "report_name": "dummy_customer",   "buffer_search":
       4000,   "etl_name": "consolidar" }
   C ETAPA 1:
     Type: Task
@@ -18,12 +18,12 @@ States:
       Payload:
         stage: 1
         
-        country_name.$: $.country_name
+        schema.$: $.schema
         drop_workflow.$: $.drop_workflow
-        customer_name.$: $.customer_name
-        buffer.$: $.buffer
+        report_name.$: $.report_name
+        buffer_search.$: $.buffer_search
         etl_name: consolidar
-        parametros.$: $.parametros
+        
       FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
@@ -58,12 +58,12 @@ States:
       Payload:
         stage: 2
         
-        country_name.$: $.country_name
+        schema.$: $.schema
         drop_workflow.$: $.drop_workflow
-        customer_name.$: $.customer_name
-        buffer.$: $.buffer
+        report_name.$: $.report_name
+        buffer_search.$: $.buffer_search
         etl_name: consolidar
-        parametros.$: $.parametros
+        
       FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:

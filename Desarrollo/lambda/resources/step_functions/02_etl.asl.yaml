@@ -18,7 +18,7 @@ States:
         Next: LP ETAPA 1
     Comment: >-
       {       "schema": "pe",  
-      "drop_workflow": false,   "customer_name": "dummy_customer",   "buffer":
+      "drop_workflow": false,   "report_name": "dummy_customer",   "buffer_search":
       4000,   "etl_name": "gastos" }
   C ETAPA 1:
     Type: Task
@@ -29,10 +29,10 @@ States:
         
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
-        customer_name.$: $.customer_name
-        buffer.$: $.buffer
+        report_name.$: $.report_name
+        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-        parametros.$: $.parametros
+        
       FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
@@ -69,10 +69,10 @@ States:
         
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
-        customer_name.$: $.customer_name
-        buffer.$: $.buffer
+        report_name.$: $.report_name
+        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-        parametros.$: $.parametros
+        
       FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
@@ -109,10 +109,10 @@ States:
         
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
-        customer_name.$: $.customer_name
-        buffer.$: $.buffer
+        report_name.$: $.report_name
+        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-        parametros.$: $.parametros
+        
       FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
@@ -149,10 +149,10 @@ States:
         
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
-        customer_name.$: $.customer_name
-        buffer.$: $.buffer
+        report_name.$: $.report_name
+        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-        parametros.$: $.parametros
+        
       FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
@@ -176,10 +176,10 @@ States:
         
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
-        customer_name.$: $.customer_name
-        buffer.$: $.buffer
+        report_name.$: $.report_name
+        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-        parametros.$: $.parametros
+        
       FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
@@ -216,10 +216,10 @@ States:
         
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
-        customer_name.$: $.customer_name
-        buffer.$: $.buffer
+        report_name.$: $.report_name
+        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-        parametros.$: $.parametros
+        
       FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
@@ -277,10 +277,10 @@ States:
         
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
-        customer_name.$: $.customer_name
-        buffer.$: $.buffer
+        report_name.$: $.report_name
+        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-        parametros.$: $.parametros
+        
       FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
@@ -316,11 +316,11 @@ States:
         stage: 1
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
-        customer_name.$: $.customer_name
+        report_name.$: $.report_name
         etl_name.$: $.etl_name
-        buffer:
+        buffer_search:
           - 0
-        parametros.$: $.parametros
+        
       FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:
@@ -356,11 +356,11 @@ States:
         stage: 2
         schema.$: $.schema
         drop_workflow.$: $.drop_workflow
-        customer_name.$: $.customer_name
+        report_name.$: $.report_name
         etl_name.$: $.etl_name
-        buffer:
+        buffer_search:
           - 0
-        parametros.$: $.parametros
+        
       FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-report-${self:custom.stage}-etl
     Retry:
       - ErrorEquals:

@@ -25,7 +25,7 @@ States:
           Parameters:
             FunctionName.$: $.lambda_name
             Payload:
-              customer_name.$: $.worker_parameters.customer_name
+              report_name.$: $.worker_parameters.report_name
               table_name.$: $.worker_parameters.table_name
               sql_query.$: $.worker_parameters.sql_query
               drop_table.$: $.worker_parameters.drop_table
