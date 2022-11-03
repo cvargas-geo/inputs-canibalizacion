@@ -9,7 +9,7 @@ from utils.conf import (
     CREATE_ATHENA_TABLE_LAMBDA_NAME,
     s3_etl_output_data,
     S3_BUCKET_DATALAKE ,
-    s3_prefix_delivery_output_data,
+    # s3_prefix_delivery_output_data,
     s3_prefix_etl_output_data,
     get_dimanic_sql_path
     )
@@ -23,10 +23,10 @@ def etl_local(event):
 
     """Desde la sf se añade el stage y el input queda en "input" """
     stage = event.get('stage', None)
-    db_stage = resolve_stage_db(event.get('input', None).get('environment', None))
 
     schema        = event.get('input', None).get('schema', None)
     report_name   = event.get('input', None).get('report_name', None)
+    environment   = event.get('input', None).get('environment', None)
     buffer_search = event.get('input', None).get('buffer_search', None)
     drop_table    = event.get('input', None).get('drop_workflow', None)
     # parametros = event #Reemplaza a id_gastos
@@ -34,6 +34,9 @@ def etl_local(event):
     # parametros = event.get('parametros', None) #Reemplaza a id_gastos
     etl_name    = event.get('input', None).get('etl_name', 'local')
     report_name = event.get('input', None).get('report_name', 'local')
+
+    db_stage = resolve_stage_db(environment)
+
     response = {}
     result = {}
 
@@ -79,7 +82,8 @@ def etl_local(event):
                                 "report_name": report_name,
                                 "table_name": custom_table_name,
                                 "sql_query": sql_querie,
-                                "drop_table": drop_table
+                                "drop_table": drop_table,
+                                "db_stage": db_stage
                             },
                     "lambda_name":CREATE_ATHENA_TABLE_LAMBDA_NAME
                     }
@@ -123,12 +127,12 @@ def etl_local(event):
                                 "report_name": report_name,
                                 "table_name": custom_table_name,
                                 "sql_query": sql_querie,
-                                "drop_table": drop_table
+                                "drop_table": drop_table,
+                                "db_stage": db_stage
                             },
                     "lambda_name":CREATE_ATHENA_TABLE_LAMBDA_NAME
                     }
-
-                    input_data ={
+                    input_data = {
                         "worker_tasks_list": [task_1]
                     }
                     return input_data

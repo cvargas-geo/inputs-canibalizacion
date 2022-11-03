@@ -1,9 +1,9 @@
-CREATE TABLE IF NOT EXISTS "{{params.target_db}}"."{{params.table_name}}"
+CREATE TABLE IF NOT EXISTS "{{target_db}}"."{{table_name}}"
     WITH (
         format='TEXTFILE',
         field_delimiter = ';',
-        external_location='{{params.s3_table_location}}',
-        bucketed_by=ARRAY['geo_id'],
+        external_location='{{s3_table_location}}',
+        bucketed_by=ARRAY['block_id'],
         bucket_count=1
     ) AS
-    {{params.sql_query}}
+    {{sql_query}}

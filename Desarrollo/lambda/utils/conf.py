@@ -22,7 +22,7 @@ if local_deployment== False     :
     EXPIRE_URL_SECONDS =  os.environ['EXPIRE_URL_SECONDS']
 else:
     base_dir = 'C:\GIT\inputs-estudios\Desarrollo\lambda'
-    SERVICE_NAME=   'cannibalization-report'
+    SERVICE_NAME=   'cannibalization'
     STAGE =   'dev'
     REGION=   'us-east-1'
     S3_BUCKET_DATALAKE =   'georesearch-datalake'
@@ -30,7 +30,7 @@ else:
     TARGET_DB =   'prod_inputs_estudios'
     DATALAKE_DB =   'prod_countries'
     DATALAKE_CRAWLER =   f'dms_{STAGE}_georesearch_datalake'
-    DELIVERY_PREFIX =   'georesearch_deliveries'
+    DELIVERY_PREFIX =   f'{SERVICE_NAME}_deliveries'
     CREATE_ATHENA_TABLE_LAMBDA_NAME = 'worker-athena-create-table'
     WAITING_TIME_IN_SECONDS = 900
     SF_01_NAME_PARALLELIZE_ETLS =  f"workflow_{STAGE}_inputs_estudios_parallelize_etls"
@@ -53,13 +53,13 @@ S3_STAGE = 'PROD' #if STAGE in ['prod'] else 'QA'
 sql_queries_dir = f"{base_dir}/sql_queries/athena/" 
 
 """ RUTAS DONDE SE GUARDAN LAS TABLAS CREADAS POR LA API """
-s3_etl_output_data = f"s3://{S3_BUCKET_DATALAKE}/{S3_STAGE}/athena_processing/inputs_estudios/"
-s3_prefix_etl_output_data = f"{S3_STAGE}/athena_processing/inputs_estudios/"
+s3_etl_output_data = f"s3://{S3_BUCKET_DATALAKE}/{S3_STAGE}/athena_processing/{SERVICE_NAME}/"
+s3_prefix_etl_output_data = f"/athena_processing/{SERVICE_NAME}/"
 s3_prefix_delivery_output_data = f"{S3_STAGE}/athena_processing/{DELIVERY_PREFIX}/"
 
 """ Lista de buffers permitidos """
 DEFAULT_BUFFERS = [
-      100, 
+      100,
       500,
       600,
       800,

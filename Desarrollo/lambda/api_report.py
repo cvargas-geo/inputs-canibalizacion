@@ -110,6 +110,7 @@ def worker_athena_create_table(event, context):
     table_name = event.get('table_name', None)
     sql_query = event.get('sql_query', None) 
     drop_table = event.get('drop_table', False) 
+    db_stage = event.get('db_stage', False) 
 
     #TODO GET FOM ENVIRONMENT VARIABLES
     # SOURCE_DB = 'prod_countries' 
@@ -118,19 +119,20 @@ def worker_athena_create_table(event, context):
     # response = {}
     try:
         # valida que las variables no sean nulas o vacías
-        if not [x for x in (table_name,   sql_query) if x  == '' or x is None] :
-            
+        if not [x for x in (table_name,   sql_query , db_stage) if x  == '' or x is None] :
+
             dll_querie =  atn.create_table(
-                table_name   = table_name,  
-                target_db    = TARGET_DB , 
+                table_name   = table_name,
+                target_db    = TARGET_DB ,
                 sql_query    = sql_query,
-                drop_table   = drop_table 
-            ) 
+                drop_table   = drop_table,
+                db_stage = db_stage
+            )
             estado = 'creada' if drop_table == False else 'eliminada'
             # msg = f"✔️ Tabla '{SOURCE_DB}.{table_name}' {estado} con éxito"
             time_remaining = time.time() - start_time
             time_log =  'Time Taken:' +  time.strftime("%H:%M:%S",time.gmtime(time_remaining))
-            
+
             return {
                 "status": "OK",
                 "dll_querie" : dll_querie,

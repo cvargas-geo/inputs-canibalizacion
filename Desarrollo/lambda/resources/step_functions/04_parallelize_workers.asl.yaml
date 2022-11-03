@@ -28,6 +28,7 @@ States:
               report_name.$: $.worker_parameters.report_name
               table_name.$: $.worker_parameters.table_name
               sql_query.$: $.worker_parameters.sql_query
+              db_stage.$: $.worker_parameters.db_stage
               drop_table.$: $.worker_parameters.drop_table
           Retry:
             - ErrorEquals:
