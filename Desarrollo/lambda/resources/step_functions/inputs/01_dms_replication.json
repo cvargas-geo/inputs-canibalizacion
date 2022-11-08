@@ -4,13 +4,13 @@
     "DEFAULT_WAIT_SECONDS": 60,
     "SOURCE_ENDPOINT_ARN": "arn:aws:dms:us-east-1:958531303673:endpoint:452KHXMN3SCETMQC75H3GZMR4TOJE4FJ35U5CFA",
     "TARGET_ENDPOINT_ARN": "arn:aws:dms:us-east-1:958531303673:endpoint:LXF5MWFWSY7M7US6US4KPDME242KSJSLFBGNOBQ",
-    "ReplicationInstanceIdentifier": "dms-replication-instance-for-datalake",
-    "ReplicationTaskIdentifier": "dms-replication-task-for-datalake",
+    "ReplicationInstanceIdentifier": "dms-replication-instance-for-cannibalization",
+    "ReplicationTaskIdentifier": "dms-replication-task-for-cannibalization",
     "FILTER_INSTANCE_REPLICATION": [
-        "dms-replication-instance-for-datalake"
+        "dms-replication-instance-for-cannibalization"
     ],
     "FILTER_TASK_REPLICATION": [
-        "dms-replication-task-for-datalake"
+        "dms-replication-task-for-cannibalization"
     ],
     "REPLICATION_INSTANCE_PARAMETERS": {
         "ReplicationInstanceIdentifier.$": "$.ReplicationInstanceIdentifier",

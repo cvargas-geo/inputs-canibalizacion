@@ -8,7 +8,10 @@ blocks con gastos y el centroide
         b.administrative_area_level_2,
         b.administrative_area_level_3,
         b.recoba_id,
-        ( g."seis" + g."cinco" + g."cuatro" + g."tres" + g."dos" + g."uno" ) as gasto,
+        ( 
+            g."seis" + g."cinco" + g."cuatro" + g."tres" + g."dos" + g."uno"
+
+            ) as gasto,
         b.longitud,
         b.latitud,
         b.centroid_wkt as shape
@@ -18,36 +21,16 @@ blocks con gastos y el centroide
             select
                 a.id,
                 a.block_id,
-                sum(
-                    case
-                        when b.gse_id = 1 then a.hog_gse1 * b.monto
-                    end
-                ) as "seis",
-                sum(
-                    case
-                        when b.gse_id = 2 then a.hog_gse2 * b.monto
-                    end
-                ) as "cinco",
-                sum(
-                    case
-                        when b.gse_id = 3 then a.hog_gse3 * b.monto
-                    end
-                ) as "cuatro",
-                sum(
-                    case
-                        when b.gse_id = 4 then a.hog_gse4 * b.monto
-                    end
-                ) as "tres",
-                sum(
-                    case
-                        when b.gse_id = 5 then a.hog_gse5 * b.monto
-                    end
-                ) as "dos",
-                sum(
-                    case
-                        when b.gse_id = 6 then a.hog_gse6 * b.monto
-                    end
-                ) as "uno"
+
+       {% for index_b in  range(params.max_gse)  %}
+        G{{ index }}.{{ params.lista_canastas[index].lower() }}_gasto_gse{{ index_b + 1 }} ,
+            sum(
+                case
+                    when b.gse_id = {{ index }} then a.hog_gse{{ index }} * b.monto
+                end
+            ) as "{{ index }}" {% if not loop.last %},{% endif %} {% if loop.last %}){% endif %}
+        {% endfor %}
+
 
             from {{db}}_countries.country_{{schema}}_view_blocks a
             left join {{db}}_countries.country_{{schema}}_canastas_total b on a.recoba_id = b.id_recoba

@@ -35,7 +35,7 @@ provider:
   # httpApi:
   #     shouldStartNameWithService: true
   #     name: ${sls:stage}
-  
+
   # Use function versioning (enabled by default)
   versionFunctions: false
   vpc:
@@ -55,6 +55,8 @@ provider:
             - "glue:StartJobRun"
             - "glue:GetTable"
             - "glue:GetTables"
+            - "glue:GetPartitions"
+            - "glue:UpdateTable"
             - "glue:GetCrawler"
             - "glue:UpdateCrawler"
             - "glue:CreateTable"

@@ -8,10 +8,10 @@
         "cvargas@georesearch.cl"
       ],
       "drop_workflow": false,
-      "buffer_search": 2000,
+      "buffer_search": 7000,
       "pois_state_id": 1,
-      "surface_factor": -1.95,
-      "distance_factor": 1.1,
+      "surface_factor": 1,
+      "distance_factor": -2,
       "start_point": "POINT(X,X)",
       "cannibalization_shape": "POLYGON((X,X))",
       "canasta_categoria_id": [

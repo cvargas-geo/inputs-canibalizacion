@@ -53,8 +53,8 @@ def report(event, context):
                     raise ValueError(f"❌ start_point no ha sido especificado")
                 if 'cannibalization_shape' not in  solicitud:
                     raise ValueError(f"❌ cannibalization_shape no ha sido especificado")
-                if 'substring_id' not in  solicitud:
-                    raise ValueError(f"❌ substring_id no ha sido especificado")
+                # if 'substring_id' not in  solicitud:
+                #     raise ValueError(f"❌ substring_id no ha sido especificado")
                 if 'pois_category_id' not in  solicitud:
                     raise ValueError(f"❌ pois_category_id no ha sido especificado")
                 if 'etl_list' not in  solicitud:
