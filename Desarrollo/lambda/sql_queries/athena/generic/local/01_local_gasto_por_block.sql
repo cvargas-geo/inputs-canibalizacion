@@ -8,10 +8,11 @@ blocks con gastos y el centroide
         b.administrative_area_level_2,
         b.administrative_area_level_3,
         b.recoba_id,
-        ( 
-            g."seis" + g."cinco" + g."cuatro" + g."tres" + g."dos" + g."uno"
-
-            ) as gasto,
+        (
+        {% for index in  range(max_gse)  %}
+                g."{{ index+1 }}" {% if not loop.last %}+{% endif %} {% if loop.last %}){% endif %}
+        {% endfor %}
+        ) as gasto,
         b.longitud,
         b.latitud,
         b.centroid_wkt as shape
@@ -21,14 +22,12 @@ blocks con gastos y el centroide
             select
                 a.id,
                 a.block_id,
-
-       {% for index_b in  range(params.max_gse)  %}
-        G{{ index }}.{{ params.lista_canastas[index].lower() }}_gasto_gse{{ index_b + 1 }} ,
+        {% for index in  range(max_gse)  %}
             sum(
                 case
-                    when b.gse_id = {{ index }} then a.hog_gse{{ index }} * b.monto
+                    when b.gse_id = {{ index+1 }} then a.hog_gse{{ index+1 }} * b.monto
                 end
-            ) as "{{ index }}" {% if not loop.last %},{% endif %} {% if loop.last %}){% endif %}
+            ) as "{{ index+1 }}" {% if not loop.last %},{% endif %} {% if loop.last %}){% endif %}
         {% endfor %}
 
 

@@ -3,6 +3,8 @@ import boto3
 import traceback
 import pandas as pd
 import awswrangler as wr
+import sqlalchemy
+from sqlalchemy import create_engine, MetaData
 from utils import bussiness_rules as br
 from utils.db_utils import db_secret, make_conn
 from utils.read import read_templated_file , resolve_stage_db
@@ -52,6 +54,7 @@ def etl_local(event):
         etapa1=True
         etapa2=True
         etapa3=True
+        etapa4=True
 
         if stage:
             if stage == 1 :
@@ -241,12 +244,53 @@ def etl_local(event):
                                 "worker_tasks_list": [task_1,task_2]
                             }
                             return input_data
+            if stage == 4 :
+                if etapa4 :
+                    """Copiado de tablas hacia el DW"""
+                    for_test_schema = 'customer_chedraui2'
+                    schema2 = for_test_schema
+                    """ 1 precalculo blocks"""
+                    df = wr.athena.read_sql_query(f"SELECT * FROM {report_name}_{schema}_local_precalculo_blocks", database=f"{environment.lower()}_{SERVICE_NAME}")
+                    # df.fillna('NULL' ,inplace=True)
+                    load_table_to_postgres(df , schema2 , 'precalculo_blocks' ,credential=None )
+                    """ 2 precalculo locales"""
+                    df = wr.athena.read_sql_query(f"SELECT * FROM {report_name}_{schema}_local_precalculo_locales", database=f"{environment.lower()}_{SERVICE_NAME}")
+                    # df.fillna('NULL' ,inplace=True)
+                    load_table_to_postgres(df , schema2 , 'precalculo_locales' ,credential=None )
+                    """ 3 gasto_por_block"""
+                    df = wr.athena.read_sql_query(f"""SELECT
+                        id,block_id,recoba_id,gasto,longitud,latitud,shape
+                        FROM {report_name}_{schema}_local_gasto_por_block""", database=f"{environment.lower()}_{SERVICE_NAME}")
+                    # df.fillna('NULL' ,inplace=True)
+                    load_table_to_postgres(df , schema2 , 'blocks_gasto' ,credential=None )
+
+                    response = {
+                                "Status": 'Ok, copia de datos realizada'
+                            }
+                    return response
         else:
             raise ValueError(f"favor especificar el stage para continuar ")
     except Exception as e:
         e = str(traceback.format_exc())
         print(e)
-        return {"error": e }
+        return {"Error": e }
+
+
+
+
+def load_table_to_postgres(df , schema , table_name ,credential=None ):
+    try:
+        engine = create_engine(r'postgresql+psycopg2://postgres:mDrZ~*=X@10.10.0.40:5432/mastergeo_countries')
+        meta = sqlalchemy.MetaData(engine, schema=schema)
+        meta.reflect(engine, schema=schema)
+        pdsql = pd.io.sql.SQLDatabase(engine, meta=meta)
+
+        # df = pd.read_sql("SELECT * FROM xxx", con=engi    ne)
+        # https://stackoverflow.com/questions/71970584/pandas-to-sql-with-dict-raises-cant-adapt-type-dict-is-there-a-way-to-avoi
+        pdsql.to_sql(df, table_name , if_exists='replace' , index=False , dtype={"properties": sqlalchemy.types.JSON})
+    except Exception as e:
+        print("Error al copiar la tabla con sqlalchemy", e)
+
 
 
 

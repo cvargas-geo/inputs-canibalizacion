@@ -41,7 +41,8 @@ master-report:
 
 etl:
   description:   ${self:service} Crea una tabla en Athena para los inputs de estudios [${self:custom.stage}]
-  memorySize: 256
+  # Se le asigna el máximo de memoria pues hace operaciones de copiado de las 3 tablas finales  hacia le dw desde athena
+  memorySize: 9000
   handler: api_etl.handler
   # Maximum retry attempts when an asynchronous invocation fails (between 0 and 2; default: 2)
   maximumRetryAttempts: 0
@@ -54,7 +55,7 @@ etl:
   package:
     # individually: true
     #  Si desea excluir archivos, puede usar un patrón global con el prefijo ! (https://www.serverless.com/framework/docs/providers/aws/guide/packaging/#patterns)
-    patterns: 
+    patterns:
       # - "!./**/*"
       - "!*.md"
       - "sql_queries/**/**/**/*.sql"
