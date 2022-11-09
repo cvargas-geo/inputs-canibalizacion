@@ -5,7 +5,7 @@ import pandas as pd
 import awswrangler as wr
 import sqlalchemy
 from sqlalchemy import create_engine, MetaData
-from utils import bussiness_rules as br
+from utils import business_rules as br
 from utils.db_utils import db_secret, make_conn
 from utils.read import read_templated_file , resolve_stage_db
 from utils.custom import list_to_sql_in , consolidar_trim_commas
@@ -21,7 +21,6 @@ from utils.conf import (
     )
 
 lambda_client = boto3.client("lambda")
-
 s3_client = boto3.client('s3')
 s3_client_resource = boto3.resource('s3')
 
@@ -71,7 +70,6 @@ def etl_local(event):
                     #         },
                     #         **event
                     # ))
-                    
                     sql_querie = read_templated_file(
                         f"{generic_path}01_{etl_name}_{table_name}.sql" ,
                         dict({
@@ -140,7 +138,7 @@ def etl_local(event):
                     print(f"A crear tabla con : {sql_querie}")
 
                     task_1 = {
-                    "task_name": f" Step 2 : Precalculo, locales con gastos {custom_table_name}",
+                    "task_name": f" Step 2 : Precálculo, locales con gastos {custom_table_name}",
                     "worker_parameters": {
                                 "report_name": report_name,
                                 "table_name": custom_table_name,

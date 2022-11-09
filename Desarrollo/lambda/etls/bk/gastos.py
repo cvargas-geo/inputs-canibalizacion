@@ -2,7 +2,7 @@ import os
 import boto3
 import traceback
 import awswrangler as wr 
-from utils import bussiness_rules as br
+from utils import business_rules as br
 from utils.read import read_templated_file
 from utils.conf import CREATE_ATHENA_TABLE_LAMBDA_NAME , DATALAKE_DB,TARGET_DB,get_dimanic_sql_path
 from utils.custom import list_to_sql_in
