@@ -20,7 +20,7 @@ lambda_client = boto3.client("lambda")
 s3_client = boto3.client('s3')
 s3_client_resource = boto3.resource('s3')
 
-def etl_local(event):
+def etl_delivery(event):
 
     """Desde la sf se añade el stage y el input queda en "input" """
     stage = event.get('stage', None)
@@ -28,13 +28,13 @@ def etl_local(event):
     schema        = event.get('input', None).get('schema', None)
     report_name   = event.get('input', None).get('report_name', None)
     environment   = event.get('input', None).get('environment', None)
-    buffer_search = event.get('input', None).get('buffer_search', None)
+    # buffer_search = event.get('input', None).get('buffer_search', None)
     drop_table    = event.get('input', None).get('drop_workflow', None)
     # parametros = event #Reemplaza a id_gastos
     # id_gastos = event.get('id_gastos', None) #TODO VALIDAR ESTE CAMPO
     # parametros = event.get('parametros', None) #Reemplaza a id_gastos
-    etl_name    = event.get('input', None).get('etl_name', 'local')
-    report_name = event.get('input', None).get('report_name', 'local')
+    etl_name    = event.get('input', None).get('etl_name', 'delivery')
+    report_name = event.get('input', None).get('report_name', 'delivery')
 
     db_stage = resolve_stage_db(environment)
 
@@ -56,74 +56,63 @@ def etl_local(event):
                 #Nota el generic_path siempre se obtiene a nivel del stage
                 generic_path = get_dimanic_sql_path(  etl_name , report_name, stage)
                 if etapa1 :
-                    print("ETL 1 de 4 : Creación de tabla de precálculo")
-                    print("Step 1 : Creación de tabla de gastos")
-                    table_name = 'gasto_por_block'
-                    # print(dict(
-                    #         {
+
+                    assert postgres_to_athena(f'reparto_idpois', environment , event)== True , "Error al obtener la tabla reparto_idpois"
+                    assert postgres_to_athena(f'locales_idpois', environment , event)== True , "Error al obtener la tabla locales_idpois"
+
+                    # table_name = 'local_manzana'
+                    # print("Step 1 : Creación de tabla {table_name}")
+                    # print("ETL 1 de 4 : Creación de tabla {table_name}")
+                    # sql_querie = read_templated_file(
+                    #     f"{generic_path}01_{etl_name}_{table_name}.sql" ,
+                    #     dict({
                     #         'ETL_NAME': etl_name,
-                    #         'db' : db_stage
+                    #         'db' : db_stage,
+                    #         'max_gse':br.get_limit_gse_by_country(schema)
                     #         },
-                    #         **event
-                    # ))
-                    sql_querie = read_templated_file(
-                        f"{generic_path}01_{etl_name}_{table_name}.sql" ,
-                        dict({
-                            'ETL_NAME': etl_name,
-                            'db' : db_stage,
-                            'max_gse':br.get_limit_gse_by_country(schema)
-                            },
-                            **(event.get('input', None))
-                        )
-                    )
+                    #         **(event.get('input', None))
+                    #     )
+                    # )
 
-                    custom_table_name = f"{report_name}_{schema}_{etl_name}_{table_name}"
-                    tabla_anterior = custom_table_name
+                    # custom_table_name = f"{report_name}_{schema}_{etl_name}_{table_name}"
+                    # tabla_anterior = custom_table_name
 
-                    print(f"A crear tabla con : {sql_querie}")
+                    # print(f"A crear tabla con : {sql_querie}")
 
-                    task_1 = {
-                    "task_name": f" Step 1 : Creación de tabla de gastos {custom_table_name}",
-                    "worker_parameters": {
-                                "report_name": report_name,
-                                "table_name": custom_table_name,
-                                "sql_query": sql_querie,
-                                "drop_table": drop_table,
-                                "db_stage": db_stage
-                            },
-                    "lambda_name":CREATE_ATHENA_TABLE_LAMBDA_NAME
-                    }
+                    # task_1 = {
+                    # "task_name": f" Step 1 : Creación de tabla de gastos {custom_table_name}",
+                    # "worker_parameters": {
+                    #             "report_name": report_name,
+                    #             "table_name": custom_table_name,
+                    #             "sql_query": sql_querie,
+                    #             "drop_table": drop_table,
+                    #             "db_stage": db_stage
+                    #         },
+                    # "lambda_name":CREATE_ATHENA_TABLE_LAMBDA_NAME
+                    # }
 
-                    input_data ={
-                        "worker_tasks_list": [task_1]
-                    }
-                    return input_data
+                    # input_data ={
+                    #     "worker_tasks_list": [task_1]
+                    # }
+                    # return input_data
+                    return {"status":"Ok"}
 
 
             if stage == 2 :
                 if etapa2 :
-                    """Segunda parte, con los gastos por block se hace una intersección con de pois 
-                    con estos https://xbrein.atlassian.net/wiki/spaces/DAT/pages/1603305473/Canibalizaci+n
-                    """
-                    print("Step 2 : Precalculo, locales con gastos ")
+                    table_name = 'sp_canibalizacion'
+                    print("Step 1 : Creación de tabla {table_name}")
+                    print("ETL 1 de 4 : Creación de tabla {table_name}")
                     #Nota el generic_path siempre se obtiene a nivel del stage
                     generic_path = get_dimanic_sql_path(  etl_name , report_name, stage)
-                    table_name = 'precalculo'
-                    # print(dict(
-                    #         {
-                    #         'ETL_NAME': etl_name,
-                    #         'db' : db_stage
-                    #         },
-                    #         **event
-                    # ))
-                    tabla_anterior = f"{report_name}_{schema}_{etl_name}_gasto_por_block"
+                    tabla_anterior = f"{report_name}_{schema}_{etl_name}_local_manzana"
                     sql_querie = read_templated_file(
                         f"{generic_path}02_{etl_name}_{table_name}.sql" ,
                         dict({
                             'ETL_NAME': etl_name,
                             'db' : db_stage,
                             'project_db' : SERVICE_NAME,
-                            'tabla_anterior_gastos' : tabla_anterior
+                            'tabla_anterior' : tabla_anterior
                             },
                             **(event.get('input', None))
                         )
@@ -243,7 +232,7 @@ def etl_local(event):
             if stage == 4 :
                 if etapa4 :
                     """
-                    Fin del proceso de canibalización local
+                    Fin del proceso de canibalización delivery
                     Copia secuencial de las tablas generadas (2 min app) hacia el DW
                     """
                     for_test_schema = f'customer_{report_name}_{schema}'

@@ -1,5 +1,32 @@
 /*
-blocks con gastos y el centroide
+
+CREATE TABLE customer_gastronomia_negocios.local_manzana_doggis (
+	geo_id integer NULL,
+	id_pois integer NULL,
+	gasto_comida_rapida float8 NULL,
+	shape geometry NULL,
+	np smallint NULL
+);
+
+
+-- carga de datos
+insert into customer_gastronomia_negocios.local_manzana_doggis 
+select
+	bg.block_id as geo_id,
+	z.pois as id_pois,
+	bg.prom_gasto as gasto_comida_rapida,
+	b.shape as shape,
+    null as np
+from customer_gastronomia_negocios.reparto_gyn_idpois z
+join customer_gastronomia_negocios.gasto_crap bg on st_within(bg.shape, z.shape)
+join country_cl.blocks b on b.geo_id = bg.block_id
+
+
+
+CREATE INDEX zona_reparto_geo_id_idx ON customer_gastronomia_negocios.reparto_gyn USING btree (id)
+CREATE INDEX local_manzana_doggis_geo_id_idx ON customer_gastronomia_negocios.local_manzana_doggis USING btree (id_pois)
+
+
 */
     select
         b.id,

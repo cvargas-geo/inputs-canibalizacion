@@ -6,7 +6,7 @@ import boto3
 
 # from etls.demografico import etl_demografico
 from etls.local import etl_local
-# from etls.local import etl_delivery
+from etls.delivery import etl_delivery
 
 from utils import step_functions  as  sf
 
@@ -68,8 +68,8 @@ def handler( event, context):
         if etl_name == "local":
             response = etl_local(event)
 
-        # if etl_name == "delivery":
-        #     response = etl_delivery(event)
+        if etl_name == "delivery":
+            response = etl_delivery(event)
 
         # if etl_name == "competencias":
         #     response = etl_competencias(event)

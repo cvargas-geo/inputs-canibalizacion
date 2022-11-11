@@ -1,12 +1,20 @@
 ﻿# import awswrangler as wr 
 # import traceback
+import time
 import boto3
 from botocore.exceptions import ClientError
+import pandas as pd
+# import awswrangler as wr
+import sqlalchemy
+from sqlalchemy import create_engine, MetaData
+from utils.conf import (
+    S3_BUCKET_DATALAKE ,
+    s3_prefix_etl_output_data,
+    SERVICE_NAME
+    )
 
-import time
-import os
+
 import logging
-
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -327,3 +335,18 @@ def wait_for_delete_files(table_name, metadata=False,db_stage = None ):
         elif 'Contents' not in s3_response :
             logger.info(f"✔️Sin datos en el bucket  : {custom_s3_output}"  )
             return True
+
+
+
+def athena_to_postres(df , schema , table_name ,credential=None   ):
+    try:
+        engine = create_engine(f"postgresql+psycopg2://{credential['username']}:{credential['password']}@{credential['host']}:credential['port']/{credential['dbname']}")
+        meta = MetaData(engine, schema=schema)
+        meta.reflect(engine, schema=schema)
+        pdsql = pd.io.sql.SQLDatabase(engine, meta=meta)
+
+        # df = pd.read_sql("SELECT * FROM xxx", con=engi    ne)
+        # https://stackoverflow.com/questions/71970584/pandas-to-sql-with-dict-raises-cant-adapt-type-dict-is-there-a-way-to-avoi
+        pdsql.to_sql(df, table_name , if_exists='replace' , index=False , dtype={"properties": sqlalchemy.types.JSON})
+    except Exception as e:
+        print("Error al copiar la tabla con sqlalchemy", e)
