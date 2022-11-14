@@ -120,21 +120,26 @@ def get_table_columns(conn, schema , table_name  ) :
 
 #TODO implement async_fetch_data
 
-def postgres_to_athena(table_name , environment , event , custom_schema_prefix = 'customer_'):
+def postgres_to_athena(table_name , environment , event , custom_schema_prefix = 'customer_' , columns='*'):
     """Ejecuta una consulta a postgres para traer table_name y cargarla en athena,
         Idealmente pensado para tablas pequeñas < 100 mb
+        Borra columnas nulas si existen en el df por incompatibilidad con awswrangler
         Se utiliza el input enviado al api para guardar los datos en S3"""
     if environment.upper() in ["PROD","QA"]:
         conn = make_conn(db_secret[environment.upper()])
         report_name = event['report_name']
         pais = event['schema']
         report_name = event['report_name']
-        sql = f"SELECT * FROM {custom_schema_prefix}{report_name}_{pais}.{table_name};"
+        sql = f"SELECT {columns} FROM {custom_schema_prefix}{report_name}_{pais}.{table_name};"
         print(sql)
         # solo pra el caso de chedraui comentar
         # sql = f"""SELECT  * FROM customer_{report_name}_{schema}.locales_propiosvf3;"""
 
         df = pd.read_sql(sql, conn)
+
+        # por paz mental se borran las columnas nulas
+        df=df.dropna(axis=1,how='all')
+
         conn.close()
         rows , cols = df.shape[0] ,df.shape[1]
         print(f"Copiando datos de {table_name}  {rows},{cols}")
