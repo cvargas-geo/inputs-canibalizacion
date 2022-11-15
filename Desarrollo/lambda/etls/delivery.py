@@ -280,21 +280,22 @@ def etl_delivery(event):
                     """
                     for_test_schema = f'customer_{report_name}_{schema}'
                     custom_schema = for_test_schema
-                    """ 1 precalculo blocks"""
-                    df = wr.athena.read_sql_query(f"SELECT * FROM {report_name}_{schema}_local_precalculo_blocks", database=f"{environment.lower()}_{SERVICE_NAME}")
+                    """ 1 sp_canibalizacion_reparto"""
+                    # gym_cl_delivery_sp_canibalizacion_reparto
+                    df = wr.athena.read_sql_query(f"SELECT * FROM {report_name}_{schema}_{etl_name}_sp_canibalizacion_reparto", database=f"{environment.lower()}_{SERVICE_NAME}")
                     # df.fillna('NULL' ,inplace=True)
-                    athena_to_postres(df , custom_schema , 'precalculo_blocks' ,credential=db_secret[environment.upper()] )
-                    """ 2 precalculo locales"""
-                    df = wr.athena.read_sql_query(f"SELECT * FROM {report_name}_{schema}_local_precalculo_locales", database=f"{environment.lower()}_{SERVICE_NAME}")
-                    # df.fillna('NULL' ,inplace=True)
-                    athena_to_postres(df , custom_schema , 'precalculo_locales' ,credential=db_secret[environment.upper()] )
-                    """ 3 gasto_por_block"""
-                    df = wr.athena.read_sql_query(f"""SELECT
-                        id,block_id,gasto,shape --optimizado
-                        --id,block_id,recoba_id,gasto,longitud,latitud,shape
-                        FROM {report_name}_{schema}_local_gasto_por_block""", database=f"{environment.lower()}_{SERVICE_NAME}")
-                    # df.fillna('NULL' ,inplace=True)
-                    athena_to_postres(df , custom_schema , 'blocks_gasto' ,credential=db_secret[environment.upper()] )
+                    athena_to_postres(df , custom_schema , 'sp_canibalizacion_reparto' ,credential=db_secret[environment.upper()] )
+                    # """ 2 precalculo locales"""
+                    # df = wr.athena.read_sql_query(f"SELECT * FROM {report_name}_{schema}_local_precalculo_locales", database=f"{environment.lower()}_{SERVICE_NAME}")
+                    # # df.fillna('NULL' ,inplace=True)
+                    # athena_to_postres(df , custom_schema , 'precalculo_locales' ,credential=db_secret[environment.upper()] )
+                    # """ 3 gasto_por_block"""
+                    # df = wr.athena.read_sql_query(f"""SELECT
+                    #     id,block_id,gasto,shape --optimizado
+                    #     --id,block_id,recoba_id,gasto,longitud,latitud,shape
+                    #     FROM {report_name}_{schema}_local_gasto_por_block""", database=f"{environment.lower()}_{SERVICE_NAME}")
+                    # # df.fillna('NULL' ,inplace=True)
+                    # athena_to_postres(df , custom_schema , 'blocks_gasto' ,credential=db_secret[environment.upper()] )
 
                     response = { "Status": 'Ok, copia de datos realizada'}
                     return response

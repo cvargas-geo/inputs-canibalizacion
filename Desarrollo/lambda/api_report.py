@@ -16,7 +16,7 @@ s3_client = boto3.client('s3')
 sf_client = boto3.client('stepfunctions')
 
 
-def report(event, context):
+def reporto(event, context):
     return {"status": "de panita","executionArn": "fake:arn:12345678"}
 
 def report(event, context):

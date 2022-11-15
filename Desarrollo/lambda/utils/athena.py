@@ -340,7 +340,7 @@ def wait_for_delete_files(table_name, metadata=False,db_stage = None ):
 
 def athena_to_postres(df , schema , table_name ,credential=None   ):
     try:
-        engine = create_engine(f"postgresql+psycopg2://{credential['username']}:{credential['password']}@{credential['host']}:credential['port']/{credential['dbname']}")
+        engine = create_engine(f"postgresql+psycopg2://{credential['username']}:{credential['password']}@{credential['host']}:{credential['port']}/{credential['dbname']}")
         meta = MetaData(engine, schema=schema)
         meta.reflect(engine, schema=schema)
         pdsql = pd.io.sql.SQLDatabase(engine, meta=meta)
@@ -350,3 +350,4 @@ def athena_to_postres(df , schema , table_name ,credential=None   ):
         pdsql.to_sql(df, table_name , if_exists='replace' , index=False , dtype={"properties": sqlalchemy.types.JSON})
     except Exception as e:
         print("Error al copiar la tabla con sqlalchemy", e)
+        raise (f"Error al copiar la tabla con sqlalchemy", e)

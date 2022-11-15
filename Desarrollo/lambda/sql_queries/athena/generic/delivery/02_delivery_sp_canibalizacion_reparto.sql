@@ -1,34 +1,3 @@
-/*
-
-CREATE TABLE customer_gastronomia_negocios.local_manzana_doggis (
-	geo_id integer NULL,
-	id_pois integer NULL,
-	gasto_comida_rapida float8 NULL,
-	shape geometry NULL,
-	np smallint NULL
-);
-
-
-carga de datos
-insert into customer_gastronomia_negocios.local_manzana_doggis
-select
-	bg.block_id as geo_id,
-	z.pois as id_pois,
-	bg.prom_gasto as gasto_comida_rapida,
-	b.shape as shape,
-    null as np
-from customer_gastronomia_negocios.reparto_gyn_idpois z
-join customer_gastronomia_negocios.gasto_crap bg on st_within(bg.shape, z.shape)
-join country_cl.blocks b on b.geo_id = bg.block_id
-
-
-
-CREATE INDEX zona_reparto_geo_id_idx ON customer_gastronomia_negocios.reparto_gyn USING btree (id)
-CREATE INDEX local_manzana_doggis_geo_id_idx ON customer_gastronomia_negocios.local_manzana_doggis USING btree (id_pois)
-
-
-*/
-
 
 with
     local_manzana as (
@@ -52,18 +21,7 @@ with
     )
     /* SELECT COUNT(*) FROM locales_manzana */
     ,sp_canibalizacion_reparto as (
-
-        /* Formato tabla creada para almacenar los datos d delivery
-            pois_id int4 NULL,
-            nombre varchar(300) NULL,
-            direccion varchar(300) NULL,
-            region varchar(50) NULL,
-            comuna varchar(50) NULL,
-            venta_mes float8 NULL,
-            venta_delivery float8 NULL,
-            venta_local float8 NULL,
-            canibalizacion numeric NULL*/
-
+        /* SE AGREGAL INFO ENVIADA POR EL CLIENTE (PODRIA CAMBIAR)*/
         select
             a.id_pois as pois_id,
     		l.local_  as nombre,
@@ -107,7 +65,7 @@ with
             canibalizacion
         from sp_canibalizacion_reparto
         where canibalizacion > 0.0
-        /* en 1 caso se aplico el siguente filtro */
+        /* para 1 caso se aplico el siguente filtro */
         /*and venta_delivery > 0*/
         order by canibalizacion desc
     )
