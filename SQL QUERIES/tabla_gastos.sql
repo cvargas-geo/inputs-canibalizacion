@@ -61,10 +61,10 @@ from (
 					when b.gse_id = 6 then a.hog_gse6 * b.monto
 				end
 			) as "uno"
-		 
+
 		from prod_countries.country_co_view_blocks a
 	    left join prod_countries.country_co_canastas_total b on a.recoba_id = b.id_recoba
-		where b.canasta_categoria_id = 20  
+		where b.canasta_categoria_id = 20
 		AND a.shape_wkt  LIKE '%POLYGON((%))'
 		group by
 		    a.id,

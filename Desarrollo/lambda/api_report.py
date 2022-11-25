@@ -9,6 +9,7 @@ import json
 from utils import athena  as  atn
 from utils import step_functions  as  sf
 from utils.conf import SF_01_NAME_PARALLELIZE_ETLS , DEFAULT_BUFFERS  ,TARGET_DB , S3_BUCKET_DATALAKE , s3_prefix_delivery_output_data,EXPIRE_URL_SECONDS
+from utils.response import response_error, response_ok
 import logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -16,8 +17,68 @@ s3_client = boto3.client('s3')
 sf_client = boto3.client('stepfunctions')
 
 
-def reporto(event, context):
-    return {"status": "de panita","executionArn": "fake:arn:12345678"}
+def input_validation(event):
+    """ Valida el input de entrada y aplica las regla para los parametros necesarios de los etls
+    retorna status y el mensaje de error en caso de algun error"""
+    #all params´s inputs
+    base_params = ["reports_request"]
+    request_params = ["environment" , "report_name" ,  "schema"  ,"report_to" , "drop_workflow" , "etl_list" ,"parametros"] 
+    etl_list = ["local","delivery","captura"]
+
+    #implementado
+    local_params_etl=["buffer_search" ,"pois_state_id","surface_factor" ,"distance_factor","canasta_categoria_id","substring_id","pois_category_id"]
+    delivery_params_etl=["cannibalization_shape","canasta_categoria_id","substring_id","pois_category_id"]
+
+    #por implementar
+    captura_params_etl=["similar_a_local_pues_ocupa_precalculo_pero_con_zonas"]
+    gap_params_etl=["cap_param"]
+
+    def missing_parameter(parameter   ):
+        return False, f"Se espera '{parameter}'"# Se crea el objeto de la clase
+
+    # por cada input se validan todos sus parametros
+    for base_param in base_params :
+        if base_param not in  event :
+            return missing_parameter(f"{base_param}")# si el parametro no esta en el request, no se valido
+
+        for request in event.get(base_param) :
+            # print(request)
+
+            for request_param in request_params :
+                if request_param not in  request :
+                    return missing_parameter(f"{base_param}.{request_param}")
+
+            if len( request.get('etl_list')) == 0 :
+
+                return  False , "Debe especificar almenos un etl"
+
+#           Reglas, cada etl en etl_list debe constener sus parametros dentro de la clave parametros
+            default_params_name = "parametros"
+#             se itera por los etls de la request para validar si existen sus parametros respectivos
+            for etl in request.get('etl_list'):
+                if etl not in  request.get(default_params_name) :
+                    return missing_parameter(f"{default_params_name}.{etl}")
+
+                # si las claves existen, se validan los parametros particulares por cada etl
+                if etl == 'local' :
+                    for etl_param in local_params_etl :
+                        if etl_param not in  request.get(default_params_name).get(etl) :
+                            return missing_parameter(f"{default_params_name}.{etl}.{etl_param}")
+                if etl == 'delivery' :
+                    for etl_param in delivery_params_etl :
+                        if etl_param not in  request.get(default_params_name).get(etl) :
+                            return missing_parameter(f"{default_params_name}.{etl}.{etl_param}")
+                if etl == 'captura' :
+                    for etl_param in captura_params_etl :
+                        if etl_param not in  request.get(default_params_name).get(etl) :
+                            return missing_parameter(f"{default_params_name}.{etl}.{etl_param}")
+                if etl == 'gap' :
+                    for etl_param in gap_params_etl :
+                        if etl_param not in  request.get(default_params_name).get(etl) :
+                            return missing_parameter(f"{default_params_name}.{etl}.{etl_param}")
+    return True , _
+
+
 
 def report(event, context):
     """En este caso cada request corresponde a una solicitud ,
@@ -27,47 +88,47 @@ def report(event, context):
     event =  event['body']
     logger.info(f"--->  {event}" )
 
-    def validate_request( event ):
-        """Valida todas las solicitudes antes de procesarlas"""
-        reports_request = event.get('reports_request', None)
+    # def validate_request( event ):
+    #     """Valida todas las solicitudes antes de procesarlas"""
+    #     reports_request = event.get('reports_request', None)
+    #     base_required_params = ["environment" , "report_name","schema","report_to","drop_workflow","parametros"]
+    #     if reports_request :
+    #         for solicitud in reports_request :
+    #             if 'environment' not in  solicitud:
+    #                 raise ValueError(f"❌ environment no ha sido especificado")
+    #             if 'report_name' not in  solicitud:
+    #                 raise ValueError(f"❌ report_name no ha sido especificado")
+    #             if 'schema' not in  solicitud:
+    #                 raise ValueError(f"❌ schema no ha sido especificado")
+    #             if 'report_to' not in  solicitud:
+    #                 raise ValueError(f"❌ report_to no ha sido especificado")
+    #             if 'drop_workflow' not in  solicitud:
+    #                 raise ValueError(f"❌ drop_workflow no ha sido especificado")
+    #             if 'buffer_search' not in  solicitud:
+    #                 raise ValueError(f"❌ buffer_search no ha sido especificado")
+    #             if 'surface_factor' not in  solicitud:
+    #                 raise ValueError(f"❌ surface_factor no ha sido especificado")
+    #             if 'distance_factor' not in  solicitud:
+    #                 raise ValueError(f"❌ distance_factor no ha sido especificado")
+    #             if 'start_point' not in  solicitud:
+    #                 raise ValueError(f"❌ start_point no ha sido especificado")
+    #             if 'cannibalization_shape' not in  solicitud:
+    #                 raise ValueError(f"❌ cannibalization_shape no ha sido especificado")
+    #             # if 'substring_id' not in  solicitud:
+    #             #     raise ValueError(f"❌ substring_id no ha sido especificado")
+    #             if 'pois_category_id' not in  solicitud:
+    #                 raise ValueError(f"❌ pois_category_id no ha sido especificado")
+    #             if 'etl_list' not in  solicitud:
+    #                 raise ValueError(f"❌ etl_list no ha sido especificado")
+    #     else:
+    #         raise ValueError("❌ reports_request no ha sido especificado")
 
-        if reports_request :
-            for solicitud in reports_request :
-                if 'environment' not in  solicitud:
-                    raise ValueError(f"❌ environment no ha sido especificado")
-                if 'report_name' not in  solicitud:
-                    raise ValueError(f"❌ report_name no ha sido especificado")
-                if 'schema' not in  solicitud:
-                    raise ValueError(f"❌ schema no ha sido especificado")
-                if 'report_to' not in  solicitud:
-                    raise ValueError(f"❌ report_to no ha sido especificado")
-                if 'drop_workflow' not in  solicitud:
-                    raise ValueError(f"❌ drop_workflow no ha sido especificado")
-                if 'buffer_search' not in  solicitud:
-                    raise ValueError(f"❌ buffer_search no ha sido especificado")
-                if 'surface_factor' not in  solicitud:
-                    raise ValueError(f"❌ surface_factor no ha sido especificado")
-                if 'distance_factor' not in  solicitud:
-                    raise ValueError(f"❌ distance_factor no ha sido especificado")
-                if 'start_point' not in  solicitud:
-                    raise ValueError(f"❌ start_point no ha sido especificado")
-                if 'cannibalization_shape' not in  solicitud:
-                    raise ValueError(f"❌ cannibalization_shape no ha sido especificado")
-                # if 'substring_id' not in  solicitud:
-                #     raise ValueError(f"❌ substring_id no ha sido especificado")
-                if 'pois_category_id' not in  solicitud:
-                    raise ValueError(f"❌ pois_category_id no ha sido especificado")
-                if 'etl_list' not in  solicitud:
-                    raise ValueError(f"❌ etl_list no ha sido especificado")
-        else:
-            raise ValueError("❌ reports_request no ha sido especificado")
-
-        return True
+    #     return True
 
     try:
-        if validate_request(event):
 
-
+        is_valid , message = input_validation(event)
+        if is_valid(event):
             reports_request = event.get('reports_request', None)
 
             # if reports_request :
@@ -92,10 +153,12 @@ def report(event, context):
                     raise Exception(sf_error)
 
             return {"status": status,"executionArn": execution_arn}
+        else:
+            return message
 
     except Exception as e:
         e = str(traceback.format_exc())
-        return {"status": "FAILED","error_msg": e}
+        return  response_error(e)
 
 
 

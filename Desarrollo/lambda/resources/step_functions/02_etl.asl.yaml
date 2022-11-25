@@ -11,30 +11,23 @@ States:
         StringMatches: local
         Next: LOCAL ETAPA 1
       - Variable: $.etl_name
-        StringMatches: competencias
-        Next: C ETAPA 1
+        StringMatches: captura
+        Next: CAPTURA ETAPA 1
       - Variable: $.etl_name
-        StringMatches: locales_propios
-        Next: LP ETAPA 1
+        StringMatches: gap
+        Next: GAP ETAPA 1
     Comment: >-
-      {       "schema": "pe",
-      "drop_workflow": false,   "report_name": "dummy_customer",   "buffer_search":
-      4000,   "etl_name": "gastos" }
-  C ETAPA 1:
+      {       "schema": "pe", "drop_workflow": false,   "report_name":
+      "dummy_customer",   "buffer_search": 4000,   "etl_name": "gastos" }
+  CAPTURA ETAPA 1:
     Type: Task
     Resource: arn:aws:states:::lambda:invoke
     Parameters:
       Payload:
         stage: 1
-
         input.$: $
-        schema.$: $.schema
-        drop_workflow.$: $.drop_workflow
-        report_name.$: $.report_name
-        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-dev-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -53,27 +46,23 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa1.response.worker_tasks_list
-    Next: C ETAPA 2
+    Next: CAPTURA  ETAPA 2
     ResultSelector:
       result.$: $.Output
       etapa: 1
     ResultPath: $.result_etapa1
-  C ETAPA 2:
+  CAPTURA  ETAPA 2:
     Type: Task
     Resource: arn:aws:states:::lambda:invoke
     Parameters:
       Payload:
         stage: 2
         input.$: $
-        schema.$: $.schema
-        drop_workflow.$: $.drop_workflow
-        report_name.$: $.report_name
-        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-dev-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -92,7 +81,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa2.response.worker_tasks_list
     ResultSelector:
@@ -107,12 +96,8 @@ States:
       Payload:
         stage: 1
         input.$: $
-        schema.$: $.schema
-        drop_workflow.$: $.drop_workflow
-        report_name.$: $.report_name
-        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-dev-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -131,7 +116,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa1.response.worker_tasks_list
     Next: LOCAL ETAPA 2
@@ -146,12 +131,8 @@ States:
       Payload:
         stage: 2
         input.$: $
-        schema.$: $.schema
-        drop_workflow.$: $.drop_workflow
-        report_name.$: $.report_name
-        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-dev-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -171,14 +152,9 @@ States:
     Parameters:
       Payload:
         stage: 1
-
         input.$: $
-        schema.$: $.schema
-        drop_workflow.$: $.drop_workflow
-        report_name.$: $.report_name
-        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-dev-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -197,7 +173,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa1.response.worker_tasks_list
     Next: DELIVERY ETAPA 2
@@ -212,13 +188,8 @@ States:
       Payload:
         stage: 2
         input.$: $
-        schema.$: $.schema
-        drop_workflow.$: $.drop_workflow
-        report_name.$: $.report_name
-        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-        
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-dev-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -237,7 +208,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa2.response.worker_tasks_list
     ResultSelector:
@@ -252,12 +223,8 @@ States:
       Payload:
         stage: 3
         input.$: $
-        schema.$: $.schema
-        drop_workflow.$: $.drop_workflow
-        report_name.$: $.report_name
-        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-dev-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -284,7 +251,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa2.response.worker_tasks_list
     ResultSelector:
@@ -299,13 +266,8 @@ States:
       Payload:
         stage: 3
         input.$: $
-        schema.$: $.schema
-        drop_workflow.$: $.drop_workflow
-        report_name.$: $.report_name
-        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-dev-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -324,7 +286,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa3.response.worker_tasks_list
     ResultSelector:
@@ -339,12 +301,8 @@ States:
       Payload:
         stage: 4
         input.$: $
-        schema.$: $.schema
-        drop_workflow.$: $.drop_workflow
-        report_name.$: $.report_name
-        buffer_search.$: $.buffer_search
         etl_name.$: $.etl_name
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-dev-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -358,21 +316,15 @@ States:
     Comment: Tabla final del etl
     ResultPath: $.etapa3
     Next: OK
-  LP ETAPA 1:
+  GAP ETAPA 1:
     Type: Task
     Resource: arn:aws:states:::lambda:invoke
     Parameters:
       Payload:
         stage: 1
         input.$: $
-        schema.$: $.schema
-        drop_workflow.$: $.drop_workflow
-        report_name.$: $.report_name
         etl_name.$: $.etl_name
-        buffer_search:
-          - 0
-        
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-dev-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException
@@ -391,29 +343,23 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa1.response.worker_tasks_list
     ResultSelector:
       result.$: $.Output
       etapa: 1
     ResultPath: $.result_etapa1
-    Next: LP ETAPA 2
-  LP ETAPA 2:
+    Next: GAP ETAPA 2
+  GAP ETAPA 2:
     Type: Task
     Resource: arn:aws:states:::lambda:invoke
     Parameters:
       Payload:
         stage: 2
         input.$: $
-        schema.$: $.schema
-        drop_workflow.$: $.drop_workflow
-        report_name.$: $.report_name
         etl_name.$: $.etl_name
-        buffer_search:
-          - 0
-        
-      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:${self:service}-${self:custom.stage}-etl
+      FunctionName: arn:aws:lambda:us-east-1:958531303673:function:cannibalization-dev-etl
     Retry:
       - ErrorEquals:
           - Lambda.ServiceException

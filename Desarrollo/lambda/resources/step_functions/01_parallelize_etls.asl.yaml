@@ -39,14 +39,7 @@ States:
                     schema.$: $.schema
                     report_to.$: $.report_to
                     drop_workflow.$: $.drop_workflow
-                    buffer_search.$: $.buffer_search
-                    surface_factor.$: $.surface_factor
-                    distance_factor.$: $.distance_factor
-                    start_point.$: $.start_point
-                    cannibalization_shape.$: $.cannibalization_shape
-                    substring_id.$: $.substring_id
-                    canasta_categoria_id.$: $.canasta_categoria_id
-                    pois_category_id.$: $.pois_category_id
+                    parametros.$: $.parametros
                   ResultSelector:
                     etl_res.$: $[1][*]
                   OutputPath: $.etl_res
@@ -62,15 +55,7 @@ States:
               report_name.$: $$.Map.Item.Value.report_name
               schema.$: $$.Map.Item.Value.schema
               report_to.$: $$.Map.Item.Value.report_to
-              drop_workflow.$: $$.Map.Item.Value.drop_workflow
-              buffer_search.$: $$.Map.Item.Value.buffer_search
-              surface_factor.$: $$.Map.Item.Value.surface_factor
-              distance_factor.$: $$.Map.Item.Value.distance_factor
-              start_point.$: $$.Map.Item.Value.start_point
-              cannibalization_shape.$: $$.Map.Item.Value.cannibalization_shape
-              substring_id.$: $$.Map.Item.Value.substring_id
-              canasta_categoria_id.$: $$.Map.Item.Value.canasta_categoria_id
-              pois_category_id.$: $$.Map.Item.Value.pois_category_id
+              parametros.$: $$.Map.Item.Value.parametros 
             ResultSelector:
               customer_res.$: $[1][*]
             MaxConcurrency: 40
