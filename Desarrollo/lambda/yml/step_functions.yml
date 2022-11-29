@@ -42,10 +42,10 @@ stateMachines:
 #       tracingConfig:
 #         enabled: true
 
-  sf_dms_1:
-    name: workflow_${self:custom.stage}_${self:service}_dms_replicacion
-    role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
-    definition:
-      ${file(./resources/step_functions/01_dms_replication.asl.yaml)}
-    tracingConfig:
-      enabled: true
+  # sf_dms_1:
+  #   name: workflow_${self:custom.stage}_${self:service}_dms_replicacion
+  #   role: arn:aws:iam::958531303673:role/service-role/StepFunctions-DMSCreateReplicationInstance-role-566d43b8
+  #   definition:
+  #     ${file(./resources/step_functions/01_dms_replication.asl.yaml)}
+  #   tracingConfig:
+  #     enabled: true

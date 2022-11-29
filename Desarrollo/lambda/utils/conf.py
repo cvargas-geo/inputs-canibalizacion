@@ -129,3 +129,18 @@ def get_dimanic_sql_path( etl_name , report_name, stage ,history_customer_list =
             sql_path = f"{sql_queries_dir}generic/{etl_name}/"
 
         return sql_path
+
+
+
+"""PARAMETROS DE CANIBALIZACION """
+base_params = ["reports_request"]
+request_params = ["environment" , "report_name" ,  "schema"  ,"report_to" , "drop_workflow" , "etl_list" ,"parametros"]
+etl_list = ["local","delivery","captura"]
+
+#implementado
+local_params_etl=["buffer_search" ,"pois_state_id","surface_factor" ,"distance_factor","canasta_categoria_id","substring_id","pois_category_id"]
+delivery_params_etl=["cannibalization_shape","canasta_categoria_id","substring_id","pois_category_id"]
+
+#por implementar
+captura_params_etl=["similar_a_local_pues_ocupa_precalculo_pero_con_zonas"]
+gap_params_etl=["cap_param"]

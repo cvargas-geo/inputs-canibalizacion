@@ -8,7 +8,17 @@ import boto3
 import json
 from utils import athena  as  atn
 from utils import step_functions  as  sf
-from utils.conf import SF_01_NAME_PARALLELIZE_ETLS , DEFAULT_BUFFERS  ,TARGET_DB , S3_BUCKET_DATALAKE , s3_prefix_delivery_output_data,EXPIRE_URL_SECONDS
+from utils import conf
+
+from utils.conf import (
+    base_params,
+    request_params,
+    etl_list,
+    local_params_etl,
+    delivery_params_etl,
+    captura_params_etl,
+    gap_params_etl
+)
 from utils.response import response_error, response_ok
 import logging
 logger = logging.getLogger()
@@ -18,147 +28,84 @@ sf_client = boto3.client('stepfunctions')
 
 
 def input_validation(event):
-    """ Valida el input de entrada y aplica las regla para los parametros necesarios de los etls
-    retorna status y el mensaje de error en caso de algun error"""
-    #all params´s inputs
-    base_params = ["reports_request"]
-    request_params = ["environment" , "report_name" ,  "schema"  ,"report_to" , "drop_workflow" , "etl_list" ,"parametros"] 
-    etl_list = ["local","delivery","captura"]
+    """ Lanza un raise si algún parámetro no se encuentra en el input """
 
-    #implementado
-    local_params_etl=["buffer_search" ,"pois_state_id","surface_factor" ,"distance_factor","canasta_categoria_id","substring_id","pois_category_id"]
-    delivery_params_etl=["cannibalization_shape","canasta_categoria_id","substring_id","pois_category_id"]
-
-    #por implementar
-    captura_params_etl=["similar_a_local_pues_ocupa_precalculo_pero_con_zonas"]
-    gap_params_etl=["cap_param"]
-
-    def missing_parameter(parameter   ):
-        return False, f"Se espera '{parameter}'"# Se crea el objeto de la clase
+    def custom_raise(parameter):
+        raise ValueError(f"Se espera '{parameter}'")
 
     # por cada input se validan todos sus parametros
-    for base_param in base_params :
+    for base_param in conf.base_params :
         if base_param not in  event :
-            return missing_parameter(f"{base_param}")# si el parametro no esta en el request, no se valido
+            custom_raise(f"{base_param}")
 
         for request in event.get(base_param) :
-            # print(request)
-
-            for request_param in request_params :
+            for request_param in conf.request_params :
                 if request_param not in  request :
-                    return missing_parameter(f"{base_param}.{request_param}")
+                    custom_raise(f"{base_param}.{request_param}")
 
             if len( request.get('etl_list')) == 0 :
 
-                return  False , "Debe especificar almenos un etl"
+                return  False , "Debe especificar al menos un etl"
 
-#           Reglas, cada etl en etl_list debe constener sus parametros dentro de la clave parametros
+#           Reglas, cada etl en etl_list debe contener sus parametros dentro de la clave parametros
             default_params_name = "parametros"
 #             se itera por los etls de la request para validar si existen sus parametros respectivos
             for etl in request.get('etl_list'):
                 if etl not in  request.get(default_params_name) :
-                    return missing_parameter(f"{default_params_name}.{etl}")
+                    custom_raise(f"{default_params_name}.{etl}")
 
                 # si las claves existen, se validan los parametros particulares por cada etl
                 if etl == 'local' :
-                    for etl_param in local_params_etl :
+                    for etl_param in conf.local_params_etl :
                         if etl_param not in  request.get(default_params_name).get(etl) :
-                            return missing_parameter(f"{default_params_name}.{etl}.{etl_param}")
+                            custom_raise(f"{default_params_name}.{etl}.{etl_param}")
                 if etl == 'delivery' :
-                    for etl_param in delivery_params_etl :
+                    for etl_param in conf.delivery_params_etl :
                         if etl_param not in  request.get(default_params_name).get(etl) :
-                            return missing_parameter(f"{default_params_name}.{etl}.{etl_param}")
+                            custom_raise(f"{default_params_name}.{etl}.{etl_param}")
                 if etl == 'captura' :
-                    for etl_param in captura_params_etl :
+                    for etl_param in conf.captura_params_etl :
                         if etl_param not in  request.get(default_params_name).get(etl) :
-                            return missing_parameter(f"{default_params_name}.{etl}.{etl_param}")
+                            custom_raise(f"{default_params_name}.{etl}.{etl_param}")
                 if etl == 'gap' :
-                    for etl_param in gap_params_etl :
+                    for etl_param in conf.gap_params_etl :
                         if etl_param not in  request.get(default_params_name).get(etl) :
-                            return missing_parameter(f"{default_params_name}.{etl}.{etl_param}")
-    return True , _
+                            custom_raise(f"{default_params_name}.{etl}.{etl_param}")
 
 
 
 def report(event, context):
-    """En este caso cada request corresponde a una solicitud ,
-        pero se podría transformar en una lista de solicitudes para procesos masivos
-    """    # start_time = time.time()
-    # event = json.loads(event['body'])
-    event =  event['body']
+    """ Cada request corresponde a una o mas solicitudes
+    """
     logger.info(f"--->  {event}" )
-
-    # def validate_request( event ):
-    #     """Valida todas las solicitudes antes de procesarlas"""
-    #     reports_request = event.get('reports_request', None)
-    #     base_required_params = ["environment" , "report_name","schema","report_to","drop_workflow","parametros"]
-    #     if reports_request :
-    #         for solicitud in reports_request :
-    #             if 'environment' not in  solicitud:
-    #                 raise ValueError(f"❌ environment no ha sido especificado")
-    #             if 'report_name' not in  solicitud:
-    #                 raise ValueError(f"❌ report_name no ha sido especificado")
-    #             if 'schema' not in  solicitud:
-    #                 raise ValueError(f"❌ schema no ha sido especificado")
-    #             if 'report_to' not in  solicitud:
-    #                 raise ValueError(f"❌ report_to no ha sido especificado")
-    #             if 'drop_workflow' not in  solicitud:
-    #                 raise ValueError(f"❌ drop_workflow no ha sido especificado")
-    #             if 'buffer_search' not in  solicitud:
-    #                 raise ValueError(f"❌ buffer_search no ha sido especificado")
-    #             if 'surface_factor' not in  solicitud:
-    #                 raise ValueError(f"❌ surface_factor no ha sido especificado")
-    #             if 'distance_factor' not in  solicitud:
-    #                 raise ValueError(f"❌ distance_factor no ha sido especificado")
-    #             if 'start_point' not in  solicitud:
-    #                 raise ValueError(f"❌ start_point no ha sido especificado")
-    #             if 'cannibalization_shape' not in  solicitud:
-    #                 raise ValueError(f"❌ cannibalization_shape no ha sido especificado")
-    #             # if 'substring_id' not in  solicitud:
-    #             #     raise ValueError(f"❌ substring_id no ha sido especificado")
-    #             if 'pois_category_id' not in  solicitud:
-    #                 raise ValueError(f"❌ pois_category_id no ha sido especificado")
-    #             if 'etl_list' not in  solicitud:
-    #                 raise ValueError(f"❌ etl_list no ha sido especificado")
-    #     else:
-    #         raise ValueError("❌ reports_request no ha sido especificado")
-
-    #     return True
-
     try:
+        event =  event['body']
 
-        is_valid , message = input_validation(event)
-        if is_valid(event):
-            reports_request = event.get('reports_request', None)
+        input_validation(event)
 
-            # if reports_request :
-            #     for solicitud in reports_request :
+        reports_request = event.get('reports_request', None)
 
+        input_data = {"reports_request":reports_request}
+        status = 'TEST'
+        execution_arn = 'fake:arn:12345678'
 
-            input_data = {"reports_request":reports_request}
-            status = 'TEST'
-            execution_arn = 'fake:arn:12345678'
-            if True :
-                ## llamada a etls en paralelo
-                """ Nota : Esta step function si bien se ejecuta correctamente excede podría tardar hasta 30 min por lo que,
-                se debe implementar un sistema para monitorear el estado de la ejecución por medio de eventos """
-                response = sf.iniciar_step_function(SF_01_NAME_PARALLELIZE_ETLS ,input_data )
-                execution_arn = response['executionArn']
+            ## llamada a etls en paralelo
+        """ Nota : Esta step function si bien se ejecuta correctamente excede podría tardar hasta 30 min por lo que,
+        se debe implementar un sistema para monitorear el estado de la ejecución por medio de eventos """
+        response = sf.iniciar_step_function(conf.SF_01_NAME_PARALLELIZE_ETLS ,input_data )
+        execution_arn = response['executionArn']
 
-                # Se agrega algo de log para la salida de la ejecución
-                sf_response = sf.sfn_client.describe_execution(executionArn=execution_arn)
-                status = sf_response['status']
-                if status == 'FAILED':
-                    sf_error = sf_response['QueryExecution']['Status']['StateChangeReason']
-                    raise Exception(sf_error)
+        # Se agrega algo de log para la salida de la ejecución
+        sf_response = sf.sfn_client.describe_execution(executionArn=execution_arn)
+        status = sf_response['status']
+        if status == 'FAILED':
+            sf_error = sf_response['QueryExecution']['Status']['StateChangeReason']
+            raise Exception(sf_error)
 
-            return {"status": status,"executionArn": execution_arn}
-        else:
-            return message
+        return {"status": status,"executionArn": execution_arn}
 
     except Exception as e:
-        e = str(traceback.format_exc())
-        return  response_error(e)
+        return  response_error(str(traceback.format_exc()))
 
 
 
@@ -186,7 +133,7 @@ def worker_athena_create_table(event, context):
 
             dll_querie =  atn.create_table(
                 table_name   = table_name,
-                target_db    = TARGET_DB ,
+                target_db    = conf.TARGET_DB ,
                 sql_query    = sql_query,
                 drop_table   = drop_table,
                 db_stage = db_stage
@@ -218,7 +165,7 @@ def get_download_links(event, context):
     executionArn = event.get('executionArn', None)
     
     # source_prefix = "PROD/athena_processing/georesearch_deliveries"
-    source_prefix = s3_prefix_delivery_output_data
+    source_prefix = conf.s3_prefix_delivery_output_data
 
     # valida que las variables no sean nulas o vacías
     try:
@@ -248,8 +195,8 @@ def get_download_links(event, context):
                     # consulta por los archivos en el bucket correspondiente de la solicitud ,
                     # recordar que se le agrego "_inputs" al final de report_name al momento de guardar 
                     # source_prefix ya lleva /
-                    s3_response = s3_client.list_objects_v2(Bucket= S3_BUCKET_DATALAKE, Prefix = f"{source_prefix}{report_name}_inputs/" )
-                    print(S3_BUCKET_DATALAKE  , f"{source_prefix}/{report_name}_inputs/", s3_response  )
+                    s3_response = s3_client.list_objects_v2(Bucket= conf.S3_BUCKET_DATALAKE, Prefix = f"{source_prefix}{report_name}_inputs/" )
+                    print(conf.S3_BUCKET_DATALAKE  , f"{source_prefix}/{report_name}_inputs/", s3_response  )
                     # un orden de la salida
                     files = sorted(s3_response['Contents'],key=lambda i:i['Key'],reverse=True)  
 
@@ -270,8 +217,8 @@ def get_download_links(event, context):
 
                         file_url = s3_client.generate_presigned_url(
                             'get_object',
-                            Params={'Bucket': S3_BUCKET_DATALAKE, 'Key':file['Key']},
-                            ExpiresIn=EXPIRE_URL_SECONDS)
+                            Params={'Bucket': conf.S3_BUCKET_DATALAKE, 'Key':file['Key']},
+                            ExpiresIn=conf.EXPIRE_URL_SECONDS)
 
                         # se genera el detalle por archivo y se concatena a la lista final por solicitud
                         file_obj = {

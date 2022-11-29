@@ -3,88 +3,54 @@ try:
 except ImportError:
     pass
 import boto3
-
-# from etls.demografico import etl_demografico
+import traceback
 from etls.local import etl_local
 from etls.delivery import etl_delivery
-
-from utils import step_functions  as  sf
-
+from etls.captura import etl_captura
+from etls.gap import etl_gap
+# from utils import conf
+from utils.response import response_error, response_ok
 lambda_client = boto3.client("lambda")
 
 """
-{
-  "reports_request": [
-    {
-      "environment": "PROD",
-      "report_name": "ficcus",
-      "schema": "cl",
-      "report_to": [
-        "cvargas@georesearch.cl"
-      ],
-      "drop_workflow": false,
-      "buffer_search": 2000,
-      "pois_state_id": 1,
-      "surface_factor": -1.95,
-      "distance_factor": 1.1,
-      "start_point": "POINT(X,X)",
-      "cannibalization_shape": "POLYGON((X,X))",
-      "canasta_categoria_id": [
-        34
-      ],
-      "substring_id_o_subcadena": [
-        4,
-        5,
-        6
-      ],
-      "pois_category_id": [
-        10008
-      ],
-      "etl_list": [
-        "local",
-        "delivery"
-      ]
-    }
-  ]
-}
 """
+
+
+def input_validation(event):
+    default_params = [
+        "stage" ,
+        "etl_name" ,
+        "input"
+    ]
+    for param in default_params:
+        if param not in event : 
+            raise ValueError(f"Se espera {param}")
+
+
 def handler( event, context):
     print(f"event --->: {event}")
-    stage = event.get('stage', None)
-    schema        = event.get('input', None).get('schema', None)
-    buffer_search = event.get('input', None).get('buffer_search', None)
-    etl_name      = event.get('input', None).get('etl_name', None)
-    report_name   = event.get('input', None).get('report_name', None)
-    response = {}
-
+    # return {"status":'DEBUG'}
     try:
-
-      # valida que las variables no sean nulas o vacías
-      if not [x for x in (schema,report_name ,etl_name , buffer_search , stage ) if x  == '' or x is None] :
-
-        # if etl_name == "demografico":
-        #     response = etl_demografico(event)
+        input_validation(event)
+        # print("pass validation")
+        etl_name      = event.get('input', None).get('etl_name', None)
+        response = {"status":'void'}
 
         if etl_name == "local":
             response = etl_local(event)
-
+            # print("pass local")
         if etl_name == "delivery":
             response = etl_delivery(event)
+            # print("pass deliv")
 
-        # if etl_name == "competencias":
-        #     response = etl_competencias(event)
+        if etl_name == "captura":
+            response = etl_captura(event)
 
-        # if etl_name == "locales_propios":
-        #     response = etl_locales_propios(event)
+        if etl_name == "gap":
+            response = etl_gap(event)
 
-        # if etl_name == "consolidar":
-        #     response = etl_consolidar(event)
-
-        return {"status": "OK","response": response}
-      else:
-          raise ValueError(f"Error (schema,report_name ,etl_name , buffer_search , stage ), No deben ser vacíos: {event}")
+        print(response)
+        return   response_ok(response)
 
     except Exception as e:
-        # tb = traceback.format_exc()
-        response['error'] = str(e)
-        return {"status": "FAIL","response": response}
+        return response_error(str(traceback.format_exc()))

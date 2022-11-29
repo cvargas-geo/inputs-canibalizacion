@@ -37,7 +37,7 @@ States:
         MaxAttempts: 6
         BackoffRate: 2
     ResultSelector:
-      response.$: $.Payload.response
+      response.$: $.Payload.data
     Next: workflow_paralelize_workers (5)
     Comment: 'Retorna las 3 primeras intersecciones '
     ResultPath: $.etapa1
@@ -46,7 +46,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa1.response.worker_tasks_list
     Next: CAPTURA  ETAPA 2
@@ -72,7 +72,7 @@ States:
         MaxAttempts: 6
         BackoffRate: 2
     ResultSelector:
-      response.$: $.Payload.response
+      response.$: $.Payload.data
     Comment: Tabla final del etl
     Next: workflow_paralelize_workers (6)
     ResultPath: $.etapa2
@@ -81,7 +81,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa2.response.worker_tasks_list
     ResultSelector:
@@ -107,7 +107,7 @@ States:
         MaxAttempts: 6
         BackoffRate: 2
     ResultSelector:
-      response.$: $.Payload.response
+      response.$: $.Payload.data
     Next: workflow_paralelize_workers  1
     Comment: 'Retorna las 3 primeras intersecciones '
     ResultPath: $.etapa1
@@ -116,7 +116,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa1.response.worker_tasks_list
     Next: LOCAL ETAPA 2
@@ -142,7 +142,7 @@ States:
         MaxAttempts: 6
         BackoffRate: 2
     ResultSelector:
-      response.$: $.Payload.response
+      response.$: $.Payload.data
     Comment: Tabla final del etl
     Next: workflow_paralelize_workers (1)
     ResultPath: $.etapa2
@@ -164,7 +164,7 @@ States:
         MaxAttempts: 6
         BackoffRate: 2
     ResultSelector:
-      response.$: $.Payload.response
+      response.$: $.Payload.data
     Next: workflow_paralelize_workers
     Comment: 'Retorna las 3 primeras intersecciones '
     ResultPath: $.etapa1
@@ -173,7 +173,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa1.response.worker_tasks_list
     Next: DELIVERY ETAPA 2
@@ -199,7 +199,7 @@ States:
         MaxAttempts: 6
         BackoffRate: 2
     ResultSelector:
-      response.$: $.Payload.response
+      response.$: $.Payload.data
     Comment: Tabla final del etl
     Next: workflow_paralelize_workers (2)
     ResultPath: $.etapa2
@@ -208,7 +208,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa2.response.worker_tasks_list
     ResultSelector:
@@ -234,7 +234,7 @@ States:
         MaxAttempts: 6
         BackoffRate: 2
     ResultSelector:
-      response.$: $.Payload.response
+      response.$: $.Payload.data
     Comment: Tabla final del etl
     Next: OK
     ResultPath: $.etapa2
@@ -251,7 +251,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa2.response.worker_tasks_list
     ResultSelector:
@@ -277,7 +277,7 @@ States:
         MaxAttempts: 6
         BackoffRate: 2
     ResultSelector:
-      response.$: $.Payload.response
+      response.$: $.Payload.data
     Comment: Tabla final del etl
     ResultPath: $.etapa3
     Next: workflow_paralelize_workers (4)
@@ -286,7 +286,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa3.response.worker_tasks_list
     ResultSelector:
@@ -312,7 +312,7 @@ States:
         MaxAttempts: 6
         BackoffRate: 2
     ResultSelector:
-      response.$: $.Payload.response
+      response.$: $.Payload.data
     Comment: Tabla final del etl
     ResultPath: $.etapa3
     Next: OK
@@ -334,7 +334,7 @@ States:
         MaxAttempts: 6
         BackoffRate: 2
     ResultSelector:
-      response.$: $.Payload.response
+      response.$: $.Payload.data
     Comment: 'Retorna las 3 primeras intersecciones '
     ResultPath: $.etapa1
     Next: workflow_paralelize_workers (7)
@@ -343,7 +343,7 @@ States:
     Resource: arn:aws:states:::states:startExecution.sync:2
     Parameters:
       StateMachineArn: >-
-        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_dev_cannibalization_parallelize_workers
+        arn:aws:states:us-east-1:958531303673:stateMachine:workflow_${self:custom.stage}_${self:service}_parallelize_workers
       Input:
         worker_tasks_list.$: $.etapa1.response.worker_tasks_list
     ResultSelector:
@@ -369,7 +369,7 @@ States:
         MaxAttempts: 6
         BackoffRate: 2
     ResultSelector:
-      response.$: $.Payload.response
+      response.$: $.Payload.data
     Comment: Tabla final del etl
     ResultPath: $.etapa2
     Next: OK

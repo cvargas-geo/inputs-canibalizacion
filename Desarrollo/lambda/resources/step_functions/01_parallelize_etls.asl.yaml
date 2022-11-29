@@ -55,6 +55,7 @@ States:
               report_name.$: $$.Map.Item.Value.report_name
               schema.$: $$.Map.Item.Value.schema
               report_to.$: $$.Map.Item.Value.report_to
+              drop_workflow.$: $$.Map.Item.Value.drop_workflow
               parametros.$: $$.Map.Item.Value.parametros 
             ResultSelector:
               customer_res.$: $[1][*]
