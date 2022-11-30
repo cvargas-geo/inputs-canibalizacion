@@ -9,16 +9,6 @@ import json
 from utils import athena  as  atn
 from utils import step_functions  as  sf
 from utils import conf
-
-from utils.conf import (
-    base_params,
-    request_params,
-    etl_list,
-    local_params_etl,
-    delivery_params_etl,
-    captura_params_etl,
-    gap_params_etl
-)
 from utils.response import response_error, response_ok
 import logging
 logger = logging.getLogger()
@@ -73,7 +63,6 @@ def input_validation(event):
                             custom_raise(f"{default_params_name}.{etl}.{etl_param}")
 
 
-
 def report(event, context):
     """ Cada request corresponde a una o mas solicitudes
     """
@@ -106,7 +95,6 @@ def report(event, context):
 
     except Exception as e:
         return  response_error(str(traceback.format_exc()))
-
 
 
 #serverless invoke --function worker-athena-create-table --path mocks/report/test.json --stage dev
@@ -156,90 +144,90 @@ def worker_athena_create_table(event, context):
     except Exception as e:
         return {"status": "FAIL","error": str(e)}
 
-def get_download_links(event, context):
-    # start_time = time.time()
-    # event = json.loads(event['body'])
-    event =  event['body']
-    logger.info(f"--->  {event}" )
+# def get_download_links(event, context):
+#     # start_time = time.time()
+#     # event = json.loads(event['body'])
+#     event =  event['body']
+#     logger.info(f"--->  {event}" )
     
-    executionArn = event.get('executionArn', None)
+#     executionArn = event.get('executionArn', None)
     
-    # source_prefix = "PROD/athena_processing/georesearch_deliveries"
-    source_prefix = conf.s3_prefix_delivery_output_data
+#     # source_prefix = "PROD/athena_processing/georesearch_deliveries"
+#     source_prefix = conf.s3_prefix_delivery_output_data
 
-    # valida que las variables no sean nulas o vacías
-    try:
-        if not [x for x in (executionArn ) if x  == '' or x is None]:
+#     # valida que las variables no sean nulas o vacías
+#     try:
+#         if not [x for x in (executionArn ) if x  == '' or x is None]:
         
-            response = sf_client.describe_execution(
-                executionArn=executionArn
-            )
+#             response = sf_client.describe_execution(
+#                 executionArn=executionArn
+#             )
 
-            if response['status'] == 'SUCCEEDED' :  
+#             if response['status'] == 'SUCCEEDED' :  
                 
-                lista_archivos_por_solicitud = []
-                # Rescatando las solicitudes de la ejecución
-                sf_input = json.loads(response['input'])
-                solicitudes  = sf_input['reports_request']
+#                 lista_archivos_por_solicitud = []
+#                 # Rescatando las solicitudes de la ejecución
+#                 sf_input = json.loads(response['input'])
+#                 solicitudes  = sf_input['reports_request']
 
-                # Para generar los enlaces de descarga a s3 se itera por cada solicitud y se rescatan sus archivos desde el bucket S3
-                # Las url expiran en x segundos ,ver EXPIRE_URL_SECONDS
-                #TODO EXPIRE_URL_SECONDS debería leerse desde serverless.yaml
-                for solicitud in solicitudes:
+#                 # Para generar los enlaces de descarga a s3 se itera por cada solicitud y se rescatan sus archivos desde el bucket S3
+#                 # Las url expiran en x segundos ,ver EXPIRE_URL_SECONDS
+#                 #TODO EXPIRE_URL_SECONDS debería leerse desde serverless.yaml
+#                 for solicitud in solicitudes:
 
-                    report_name = solicitud['report_name']
-                    # print(solicitud)
+#                     report_name = solicitud['report_name']
+#                     # print(solicitud)
 
-                    files_by_solicitud =[] 
+#                     files_by_solicitud =[] 
 
-                    # consulta por los archivos en el bucket correspondiente de la solicitud ,
-                    # recordar que se le agrego "_inputs" al final de report_name al momento de guardar 
-                    # source_prefix ya lleva /
-                    s3_response = s3_client.list_objects_v2(Bucket= conf.S3_BUCKET_DATALAKE, Prefix = f"{source_prefix}{report_name}_inputs/" )
-                    print(conf.S3_BUCKET_DATALAKE  , f"{source_prefix}/{report_name}_inputs/", s3_response  )
-                    # un orden de la salida
-                    files = sorted(s3_response['Contents'],key=lambda i:i['Key'],reverse=True)  
+#                     # consulta por los archivos en el bucket correspondiente de la solicitud ,
+#                     # recordar que se le agrego "_inputs" al final de report_name al momento de guardar 
+#                     # source_prefix ya lleva /
+#                     s3_response = s3_client.list_objects_v2(Bucket= conf.S3_BUCKET_DATALAKE, Prefix = f"{source_prefix}{report_name}_inputs/" )
+#                     print(conf.S3_BUCKET_DATALAKE  , f"{source_prefix}/{report_name}_inputs/", s3_response  )
+#                     # un orden de la salida
+#                     files = sorted(s3_response['Contents'],key=lambda i:i['Key'],reverse=True)  
 
-                    # print(s3_response)
-                    # files = s3_response['Contents']
+#                     # print(s3_response)
+#                     # files = s3_response['Contents']
 
-                    #por cada archivo dentro del bucket se genera una url prefirmada que solo es visible por quien tenga este enlace
-                    url_list = []
+#                     #por cada archivo dentro del bucket se genera una url prefirmada que solo es visible por quien tenga este enlace
+#                     url_list = []
 
-                    for file in files : 
-                        file_obj = {} # detalle de cada archivo , nombre y url 
+#                     for file in files : 
+#                         file_obj = {} # detalle de cada archivo , nombre y url 
 
-                        #obtiene el ultimo split correspondiente al nombre 
-                        file_name  = file['Key'].split('/')[-1]
+#                         #obtiene el ultimo split correspondiente al nombre 
+#                         file_name  = file['Key'].split('/')[-1]
 
-                        # split anterior corresponde al nombre de la solicitud  
-                        # input_name  = file['Key'].split('/')[-2]
+#                         # split anterior corresponde al nombre de la solicitud  
+#                         # input_name  = file['Key'].split('/')[-2]
 
-                        file_url = s3_client.generate_presigned_url(
-                            'get_object',
-                            Params={'Bucket': conf.S3_BUCKET_DATALAKE, 'Key':file['Key']},
-                            ExpiresIn=conf.EXPIRE_URL_SECONDS)
+#                         file_url = s3_client.generate_presigned_url(
+#                             'get_object',
+#                             Params={'Bucket': conf.S3_BUCKET_DATALAKE, 'Key':file['Key']},
+#                             ExpiresIn=conf.EXPIRE_URL_SECONDS)
 
-                        # se genera el detalle por archivo y se concatena a la lista final por solicitud
-                        file_obj = {
-                            'name':file_name,
-                            'url':file_url 
-                        }
-                        url_list.append(file_obj)
+#                         # se genera el detalle por archivo y se concatena a la lista final por solicitud
+#                         file_obj = {
+#                             'name':file_name,
+#                             'url':file_url 
+#                         }
+#                         url_list.append(file_obj)
 
-                    # result = {'url_list':url_list}
+#                     # result = {'url_list':url_list}
 
-                    #aca se genera el detalle por cada solicitud junto a sus urls
-                    lista_archivos_por_solicitud.append({'report_name':report_name,'url_list':url_list})
+#                     #aca se genera el detalle por cada solicitud junto a sus urls
+#                     lista_archivos_por_solicitud.append({'report_name':report_name,'url_list':url_list})
                     
                 
-                # print(json.dumps(lista_archivos_por_solicitud ,  indent=4) )
-                return lista_archivos_por_solicitud
+#                 # print(json.dumps(lista_archivos_por_solicitud ,  indent=4) )
+#                 return lista_archivos_por_solicitud
 
-            else:
-                raise "Error, esta ejecución no esta lista para ser consultada."
-        else:
-            raise ValueError(f"Error (executionArn), No deben ser vacíos: {event}")
+#             else:
+#                 raise "Error, esta ejecución no esta lista para ser consultada."
+#         else:
+#             raise ValueError(f"Error (executionArn), No deben ser vacíos: {event}")
 
-    except Exception as e:
-        return {"status": "FAIL","error": str(e)}
+#     except Exception as e:
+#         return {"status": "FAIL","error": str(e)}

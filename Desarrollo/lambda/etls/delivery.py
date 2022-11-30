@@ -28,7 +28,6 @@ def input_validation(event):
             raise ValueError(f"Se espera {param}")
 
 
-
 def etl_delivery(event):
 
     """Desde la sf se añade el stage y el input queda en "input" """
@@ -158,8 +157,6 @@ def etl_delivery(event):
                 response = { "Status": 'Skip'}
 
             return response
-        # else:
-        #     raise message
 
     except Exception as e:
         return response_error(str(traceback.format_exc()))

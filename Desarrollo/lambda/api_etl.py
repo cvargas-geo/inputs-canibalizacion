@@ -12,10 +12,6 @@ from etls.gap import etl_gap
 from utils.response import response_error, response_ok
 lambda_client = boto3.client("lambda")
 
-"""
-"""
-
-
 def input_validation(event):
     default_params = [
         "stage" ,
@@ -23,7 +19,7 @@ def input_validation(event):
         "input"
     ]
     for param in default_params:
-        if param not in event : 
+        if param not in event :
             raise ValueError(f"Se espera {param}")
 
 
