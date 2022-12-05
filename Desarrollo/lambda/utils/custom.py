@@ -49,6 +49,8 @@ def list_to_sql_in(python_list):
     return ','.join(map(str, python_list))
 
 
+def list_replace(lista ,old, new ):
+    return list(map(lambda x: x.replace(old, new), lista))
 
 def consolidar_trim_commas(sql):
     """ Elimina la ultima coma de cada parte del union all """

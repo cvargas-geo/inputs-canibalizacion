@@ -6,6 +6,7 @@ from .aws_utils import get_secret
 
 import pandas as pd
 import awswrangler as wr
+from utils.custom import list_to_sql_in  ,list_replace 
 # import sqlalchemy
 # from sqlalchemy import create_engine, MetaData
 from utils.conf import (
@@ -111,11 +112,19 @@ def async_execute_query(aconn, query, params):
     wait(acursor.connection)
     # print("DEBUG: End execute_query")
 
-def get_table_columns(conn, schema , table_name  ) : 
+def get_table_columns(conn, schema , table_name   , columns='*') :
+    """
+        Se castean los geometries shape por ST_ASTEXT(shape) shape_wkt,
+    para poder leerlos desde athena
+    """
     cursor = conn.cursor()
-    cursor.execute(f"SELECT * FROM {schema}.{table_name} LIMIT 0" )
+    cursor.execute(f"SELECT {columns} FROM {schema}.{table_name} LIMIT 0" )
     colnames = [desc[0] for desc in cursor.description]
     cursor.close()
+
+    if 'shape' in  colnames :
+        colnames = list_replace(colnames , 'shape'  ,'ST_ASTEXT(shape) shape_wkt')
+
     return colnames
 
 #TODO implement async_fetch_data
@@ -125,12 +134,17 @@ def postgres_to_athena(table_name , environment , event , custom_schema_prefix =
         Idealmente pensado para tablas pequeñas < 100 mb
         Borra columnas nulas si existen en el df por incompatibilidad con awswrangler
         Se utiliza el input enviado al api para guardar los datos en S3"""
+
+
     if environment.upper() in ["PROD","QA"]:
         conn = make_conn(db_secret[environment.upper()])
-        report_name = event['report_name']
         pais = event['schema']
         report_name = event['report_name']
-        sql = f"SELECT {columns} FROM {custom_schema_prefix}{report_name}_{pais}.{table_name};"
+        schema = f"{custom_schema_prefix}{report_name}_{pais}"
+        # sql = f"SELECT {columns} FROM {schema}.{table_name};"
+        table_columns = get_table_columns(conn, schema , table_name , columns  )
+        columns = list_to_sql_in(table_columns)
+        sql = f"SELECT {columns} FROM {schema}.{table_name};"
         print(sql)
         # solo pra el caso de chedraui comentar
         # sql = f"""SELECT  * FROM customer_{report_name}_{schema}.locales_propiosvf3;"""

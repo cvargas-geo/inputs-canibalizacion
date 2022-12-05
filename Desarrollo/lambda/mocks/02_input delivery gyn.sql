@@ -2,7 +2,7 @@
   "reports_request": [
     {
       "environment": "PROD",
-      "report_name": "gym",
+      "report_name": "gyn",
       "schema": "cl",
       "report_to": [
         "cvargas@georesearch.cl"
