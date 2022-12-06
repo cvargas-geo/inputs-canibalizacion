@@ -15,7 +15,7 @@ blocks con gastos y el centroide
         ) as gasto,
         b.longitud,
         b.latitud,
-        b.centroid_wkt as shape
+        b.centroid_wkt as shape_wkt
     from  {{db}}_countries.country_{{schema}}_view_blocks b
     LEFT JOIN
     (

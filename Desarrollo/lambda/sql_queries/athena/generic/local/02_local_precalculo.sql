@@ -22,12 +22,12 @@ WITH
             p.sales_area as superficie,
             b.gasto as gasto,
 			/*distancia del local al local con gastos*/
-            /* ST_Distance( ST_GeometryFromText(p.shape_wkt), ST_GeometryFromText(b.shape) ) * 111139.0 as distancia , */
+            /* ST_Distance( ST_GeometryFromText(p.shape_wkt), ST_GeometryFromText(b.shape_wkt) ) * 111139.0 as distancia , */
 
             POWER(
                 ST_Distance(
                     ST_GeometryFromText(p.shape_wkt),
-                    ST_GeometryFromText(b.shape)
+                    ST_GeometryFromText(b.shape_wkt)
                 ) * 111139.0,
                 {{distance_factor}}
             )
@@ -44,8 +44,8 @@ WITH
             /*Pseudo buffer_search no es 100% circular , se alarga en los polos ,  pero es una buena aproximacion pues respeta el radio
             Daniel artigas aprobo esta solucion*/
             ST_Buffer(
-                ST_GeometryFromText( b.shape  ) ,
-                {{buffer_search|int}}.0 * 360.0 / (2.0 * pi() * cos( radians(ST_Y(b.shape )) )* 6400000.0)
+                ST_GeometryFromText( b.shape_wkt  ) ,
+                {{buffer_search|int}}.0 * 360.0 / (2.0 * pi() * cos( radians(ST_Y(b.shape_wkt )) )* 6400000.0)
             )
         )
         WHERE p.sales_area > 0 AND b.gasto > 0

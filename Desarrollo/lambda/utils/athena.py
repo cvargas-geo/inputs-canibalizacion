@@ -7,6 +7,7 @@ import pandas as pd
 # import awswrangler as wr
 import sqlalchemy
 from sqlalchemy import create_engine, MetaData
+from utils.db_utils import make_conn, execute_query
 from utils.conf import (
     S3_BUCKET_DATALAKE ,
     s3_prefix_etl_output_data,
@@ -348,6 +349,23 @@ def athena_to_postres(df , schema , table_name ,credential=None   ):
         # df = pd.read_sql("SELECT * FROM xxx", con=engi    ne)
         # https://stackoverflow.com/questions/71970584/pandas-to-sql-with-dict-raises-cant-adapt-type-dict-is-there-a-way-to-avoi
         pdsql.to_sql(df, table_name , if_exists='replace' , index=False , dtype={"properties": sqlalchemy.types.JSON})
+
+        # aprovecho de convertir el shape texto a geometry y borrar la columna shape_wkt
+        if "shape_wkt" in df.columns :
+            conn = make_conn(credential)
+
+            sql_querie = f"""ALTER TABLE {schema}.{table_name}
+                            ADD COLUMN shape geometry;"""
+            execute_query(conn  , sql_querie , {})
+            sql_querie = f"""UPDATE {schema}.{table_name}
+                            SET shape = ST_GeomFromText(shape_wkt);"""
+            execute_query(conn  , sql_querie , {})
+            sql_querie = f"""ALTER TABLE  {schema}.{table_name}
+                            DROP COLUMN shape_wkt;"""
+            execute_query(conn  , sql_querie , {})
+
+            conn.close()
+
     except Exception as e:
         print("Error al copiar la tabla con sqlalchemy", e)
-        raise (f"Error al copiar la tabla con sqlalchemy", e)
+        raise Exception(f"Error al copiar la tabla con sqlalchemy", e)

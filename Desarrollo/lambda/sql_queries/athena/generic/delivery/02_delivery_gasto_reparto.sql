@@ -17,7 +17,7 @@ with
                 then   1.0 else 0.0 end as np */
         from {{db}}_cannibalization.{{report_name}}_{{schema}}_zonas_reparto z
         join {{db}}_cannibalization.{{report_name}}_{{schema}}_{{ETL_NAME}}_gasto_por_block bg on 
-                ST_intersects(ST_GeometryFromText(bg.shape), ST_GeometryFromText(z.shape_wkt))
+                ST_intersects(ST_GeometryFromText(bg.shape_wkt), ST_GeometryFromText(z.shape_wkt))
         join {{db}}_countries.country_{{schema}}_view_blocks b on b.block_id = bg.block_id
         where b.shape_wkt like '%POLYGON((%))'
         and  z.shape_wkt like '%POLYGON((%))'

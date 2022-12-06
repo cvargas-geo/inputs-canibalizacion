@@ -161,16 +161,7 @@ def etl_delivery(event):
                 custom_schema_pg = f'customer_{report_name}_{schema}'
                 athena_to_postres(df , custom_schema_pg , table_for_copy ,credential=db_secret[environment.upper()] )
 
-                # Agrega la columna shape como geometry type si existiera en la tabla de athena
-                if "shape_wkt" in df.columns :
-                    conn = make_conn(db_secret[environment.upper()])
-                    sql_querie = f"""ALTER TABLE {custom_schema_pg}.{table_for_copy}
-                                    ADD COLUMN shape geometry;"""
-                    execute_query(conn  , sql_querie , {})
-                    sql_querie = f"""UPDATE {custom_schema_pg}.{table_for_copy}
-                                    SET shape = ST_GeomFromText(shape_wkt);"""
-                    execute_query(conn  , sql_querie , {})
-                    conn.close()
+
 
                 response = { "Status": 'Ok, copia athena-pg'}
             else:

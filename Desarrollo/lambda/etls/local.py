@@ -226,7 +226,7 @@ def etl_local(event):
             }
             return input_data
 
-        if stage == 3 and etapa4:
+        if stage == 4 and etapa4:
             """
             Fin del proceso de canibalización local
             Copia secuencial de las tablas generadas (2 min app) hacia el DW
@@ -243,7 +243,7 @@ def etl_local(event):
             athena_to_postres(df , custom_schema , 'precalculo_locales' ,credential=db_secret[environment.upper()] )
             """ 3 gasto_por_block"""
             df = wr.athena.read_sql_query(f"""SELECT
-                id,block_id,gasto,shape --optimizado
+                id,block_id,gasto,shape_wkt --optimizado
                 --id,block_id,recoba_id,gasto,longitud,latitud,shape
                 FROM {report_name}_{schema}_local_gasto_por_block""", database=f"{environment.lower()}_{conf.SERVICE_NAME}")
             # df.fillna('NULL' ,inplace=True)
@@ -253,4 +253,4 @@ def etl_local(event):
             return response
 
     except Exception as e:
-        return response_error(str(traceback.format_exc()))
+        return response_error(str(e))
