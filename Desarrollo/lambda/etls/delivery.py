@@ -56,9 +56,6 @@ def etl_delivery(event):
             #Nota el generic_path siempre se obtiene a nivel del stage
             generic_path = conf.get_dimanic_sql_path(  etl_name , report_name, stage)
 
-            copy_table = 'zonas_reparto'
-            assert postgres_to_athena(copy_table, environment , event["input"] , columns='id_pois ,shape'  ) == True , f"Error al obtener la tabla {copy_table}"
-
             table_name = 'gasto_por_block'
             sql_querie = read_templated_file(
                 f"{generic_path}01_{etl_name}_{table_name}.sql" ,

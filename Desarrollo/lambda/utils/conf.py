@@ -142,5 +142,5 @@ local_params_etl=["buffer_search" ,"pois_state_id","surface_factor" ,"distance_f
 delivery_params_etl=["cannibalization_shape","canasta_categoria_id","substring_id","pois_category_id"]
 
 #por implementar
-captura_params_etl=["similar_a_local_pues_ocupa_precalculo_pero_con_zonas"]
+captura_params_etl=["buffer_search" ,"pois_state_id","surface_factor" ,"distance_factor","canasta_categoria_id","substring_id","pois_category_id"]
 gap_params_etl=["cap_param"]
